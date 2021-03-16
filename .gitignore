@@ -1,0 +1,4 @@
+/.idea/
+/trading.iml
+/target/
+**/*.log
