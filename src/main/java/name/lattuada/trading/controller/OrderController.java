@@ -31,25 +31,33 @@ public class OrderController {
 
     @GetMapping()
     public ResponseEntity<List<Order>> getOrders() {
-        List<Order> orderList = orderRepository.findAll();
-        if (orderList.isEmpty()) {
-            logger.info("No orders found");
-            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        try {
+            List<Order> orderList = orderRepository.findAll();
+            if (orderList.isEmpty()) {
+                logger.info("No orders found");
+                return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+            }
+            logger.debug("Found {} orders: {}", orderList.size(), orderList);
+            return new ResponseEntity<>(orderList, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
-        logger.debug("Found {} orders: {}", orderList.size(), orderList);
-        return new ResponseEntity<>(orderList, HttpStatus.OK);
     }
 
     @GetMapping("{id}")
     public ResponseEntity<Order> getOrderById(@PathVariable("id") UUID uuid) {
-        Optional<Order> optOrder = orderRepository.findById(uuid);
-        return optOrder.map(order -> {
-            logger.debug("Order found: {}", order);
-            return new ResponseEntity<>(order, HttpStatus.OK);
-        }).orElseGet(() -> {
-            logger.warn("No order found having id {}", uuid);
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        });
+        try {
+            Optional<Order> optOrder = orderRepository.findById(uuid);
+            return optOrder.map(order -> {
+                logger.debug("Order found: {}", order);
+                return new ResponseEntity<>(order, HttpStatus.OK);
+            }).orElseGet(() -> {
+                logger.warn("No order found having id {}", uuid);
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            });
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
@@ -59,37 +67,39 @@ public class OrderController {
             created = orderRepository.getOne(created.getId());
             logger.debug("Added order {}", created);
             //
-            EOrderType createdOrderType = created.getType();
-            UUID createdSecurityId = created.getSecurityId();
-            List<Order> relatedOrders = orderRepository.findBySecurityIdAndTypeAndFulfilled(createdSecurityId,
-                    EOrderType.BUY.equals(createdOrderType) ? EOrderType.SELL : EOrderType.BUY,
+            List<Order> relatedOrders = orderRepository.findBySecurityIdAndTypeAndFulfilled(created.getSecurityId(),
+                    EOrderType.BUY.equals(created.getType()) ? EOrderType.SELL : EOrderType.BUY,
                     false);
-            if (!relatedOrders.isEmpty()) {
-                logger.info("Found related order(s). Created: {}; related found: {}", created, relatedOrders);
-                if (EOrderType.BUY.equals(createdOrderType)) {
-                    // I created a BUY order and now I found all related SELL order(s)
-                    // Find the one with min price
-                    Order related = orderRepository.getOne(relatedOrders.stream()
-                            .min(Comparator.comparing(Order::getPrice))
-                            .orElseThrow(NoSuchElementException::new).getId());
-                    if (created.getPrice() >= related.getPrice()) {
-                        createTrade(created, related);
-                    }
-                } else {
-                    // I created a SELL order and now I found all related BUY order(s)
-                    // For sake of simplicity, I take the first one
-                    Order related = orderRepository.getOne(relatedOrders.get(0).getId());
-                    if (created.getPrice() <= related.getPrice()) {
-                        createTrade(related, created);
-                    }
-                }
-            } else {
-                logger.debug("No unfulfilled related orders found for securityId {}", createdSecurityId);
-            }
+            manageTrading(created, relatedOrders);
             //
             return new ResponseEntity<>(created, HttpStatus.CREATED);
         } catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    private void manageTrading(Order created, List<Order> relatedOrders) {
+        if (!relatedOrders.isEmpty()) {
+            logger.info("Found related order(s). Created: {}; related found: {}", created, relatedOrders);
+            if (EOrderType.BUY.equals(created.getType())) {
+                // I created a BUY order and now I found all related SELL order(s)
+                // Find the one with min price
+                Order related = orderRepository.getOne(relatedOrders.stream()
+                        .min(Comparator.comparing(Order::getPrice))
+                        .orElseThrow(NoSuchElementException::new).getId());
+                if (created.getPrice() >= related.getPrice()) {
+                    createTrade(created, related);
+                }
+            } else {
+                // I created a SELL order and now I found all related BUY order(s)
+                // For sake of simplicity, I take the first one
+                Order related = orderRepository.getOne(relatedOrders.get(0).getId());
+                if (created.getPrice() <= related.getPrice()) {
+                    createTrade(related, created);
+                }
+            }
+        } else {
+            logger.debug("No unfulfilled related orders found for securityId {}", created.getSecurityId());
         }
     }
 

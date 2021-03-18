@@ -8,6 +8,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -21,22 +22,30 @@ public class SecurityController {
 
     @GetMapping()
     public ResponseEntity<List<Security>> getSecurities() {
-        List<Security> securityList = securityRepository.findAll();
-        if (securityList.isEmpty()) {
-            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        try {
+            List<Security> securityList = securityRepository.findAll();
+            if (securityList.isEmpty()) {
+                return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+            }
+            return new ResponseEntity<>(securityList, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
-        return new ResponseEntity<>(securityList, HttpStatus.OK);
     }
 
     @GetMapping("{id}")
     public ResponseEntity<Security> getSecurityById(@PathVariable("id") UUID uuid) {
-        Optional<Security> optSecurity = securityRepository.findById(uuid);
-        return optSecurity.map(security -> new ResponseEntity<>(security, HttpStatus.OK))
-                .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
+        try {
+            Optional<Security> optSecurity = securityRepository.findById(uuid);
+            return optSecurity.map(security -> new ResponseEntity<>(security, HttpStatus.OK))
+                    .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Security> addSecurity(@RequestBody Security security) {
+    public ResponseEntity<Security> addSecurity(@Valid @RequestBody Security security) {
         try {
             Security created = securityRepository.save(security);
             return new ResponseEntity<>(created, HttpStatus.CREATED);
