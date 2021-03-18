@@ -15,9 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 @RestController
 @RequestMapping("/api/orders")
@@ -61,41 +59,57 @@ public class OrderController {
             created = orderRepository.getOne(created.getId());
             logger.debug("Added order {}", created);
             //
-            EOrderType orderType = created.getType();
-            UUID securityId = created.getSecurityId();
-            List<Order> relatedOrders = orderRepository.findBySecurityIdAndTypeAndFulfilled(securityId,
-                    EOrderType.BUY.equals(orderType) ? EOrderType.SELL : EOrderType.BUY,
+            EOrderType createdOrderType = created.getType();
+            UUID createdSecurityId = created.getSecurityId();
+            List<Order> relatedOrders = orderRepository.findBySecurityIdAndTypeAndFulfilled(createdSecurityId,
+                    EOrderType.BUY.equals(createdOrderType) ? EOrderType.SELL : EOrderType.BUY,
                     false);
             if (!relatedOrders.isEmpty()) {
                 logger.info("Found related order(s). Created: {}; related found: {}", created, relatedOrders);
-                Order related = orderRepository.getOne(relatedOrders.get(0).getId());
-                if (EOrderType.SELL.equals(orderType)
-                        && created.getPrice() <= related.getPrice()) {
-                    logger.debug("It's time to trade!");
-                    // Create trade
-                    Trade trade = new Trade();
-                    trade.setPrice(created.getPrice());
-                    trade.setQuantity(related.getQuantity());
-                    trade.setOrderSellId(created.getId());
-                    trade.setOrderBuyId(related.getId());
-                    trade = tradeRepository.save(trade);
-                    logger.info("Trade has been created: {}", trade);
-                    // Update orders
-                    created.setFulfilled(Boolean.TRUE);
-                    related.setFulfilled(Boolean.TRUE);
-                    related = orderRepository.save(related);
-                    logger.info("Related order has been updated: {}", related);
-                    created = orderRepository.save(created);
-                    logger.info("Order has bee updated: {}", created);
+                if (EOrderType.BUY.equals(createdOrderType)) {
+                    // I created a BUY order and now I found all related SELL order(s)
+                    // Find the one with min price
+                    Order related = orderRepository.getOne(relatedOrders.stream()
+                            .min(Comparator.comparing(Order::getPrice))
+                            .orElseThrow(NoSuchElementException::new).getId());
+                    if (created.getPrice() >= related.getPrice()) {
+                        createTrade(created, related);
+                    }
+                } else {
+                    // I created a SELL order and now I found all related BUY order(s)
+                    // For sake of simplicity, I take the first one
+                    Order related = orderRepository.getOne(relatedOrders.get(0).getId());
+                    if (created.getPrice() <= related.getPrice()) {
+                        createTrade(related, created);
+                    }
                 }
             } else {
-                logger.debug("No unfulfilled related orders found for securityId {}", securityId);
+                logger.debug("No unfulfilled related orders found for securityId {}", createdSecurityId);
             }
             //
             return new ResponseEntity<>(created, HttpStatus.CREATED);
         } catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
+    }
+
+    private void createTrade(Order buy, Order sell) {
+        logger.debug("It's time to trade!");
+        // Create trade
+        Trade trade = new Trade();
+        trade.setPrice(sell.getPrice());
+        trade.setQuantity(buy.getQuantity());
+        trade.setOrderSellId(sell.getId());
+        trade.setOrderBuyId(buy.getId());
+        trade = tradeRepository.save(trade);
+        logger.info("Trade has been created: {}", trade);
+        // Update orders
+        buy.setFulfilled(Boolean.TRUE);
+        sell.setFulfilled(Boolean.TRUE);
+        sell = orderRepository.save(sell);
+        logger.info("Sell order has been updated: {}", sell);
+        buy = orderRepository.save(buy);
+        logger.info("Buy order has bee updated: {}", buy);
     }
 
 }
