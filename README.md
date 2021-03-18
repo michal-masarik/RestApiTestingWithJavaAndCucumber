@@ -2,8 +2,7 @@
 
 This is a simple trading application.
 
-Being a first draft, it uses an in-memory H2 database. Every time it is started, some 
-sample data are stored in such database.
+Being a first draft, it uses an in-memory H2 database. Neither the schema, nor the data are created.
 
 ## Required tools and libraries
 
@@ -41,6 +40,7 @@ mvn test
 ## Verify database content
 When the application is running, you can check the database content with a browser: http://localhost:8080/h2-console/
 * JDBC URL: `jdbc:h2:mem:trading`
+* Password: `password` (see entry `spring.datasource.password` in `application.properties`)
 
 ## Debugging
 * SQL statements are not logged by default. To turn them on, set the entry `spring.jpa.show-sql` 
