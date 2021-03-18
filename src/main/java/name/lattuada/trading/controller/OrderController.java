@@ -1,5 +1,8 @@
 package name.lattuada.trading.controller;
 
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 import name.lattuada.trading.model.EOrderType;
 import name.lattuada.trading.model.Order;
 import name.lattuada.trading.model.Trade;
@@ -30,6 +33,12 @@ public class OrderController {
     ITradeRepository tradeRepository;
 
     @GetMapping()
+    @ApiOperation(value = "Get list of orders",
+            notes = "Returns a list of orders")
+    @ApiResponses(value = {
+            @ApiResponse(code = 204, message = "No orders"),
+            @ApiResponse(code = 500, message = "Server error")
+    })
     public ResponseEntity<List<Order>> getOrders() {
         try {
             List<Order> orderList = orderRepository.findAll();
@@ -45,6 +54,12 @@ public class OrderController {
     }
 
     @GetMapping("{id}")
+    @ApiOperation(value = "Get a specific order",
+            notes = "Returns specific order given its id")
+    @ApiResponses(value = {
+            @ApiResponse(code = 404, message = "No orders found"),
+            @ApiResponse(code = 500, message = "Server error")
+    })
     public ResponseEntity<Order> getOrderById(@PathVariable("id") UUID uuid) {
         try {
             Optional<Order> optOrder = orderRepository.findById(uuid);
@@ -61,6 +76,12 @@ public class OrderController {
     }
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
+    @ApiOperation(value = "Create order",
+            notes = "Create a new order. Note: its ID is not mandatory, but it will be automatically generated")
+    @ApiResponses(value = {
+            @ApiResponse(code = 201, message = "Order created"),
+            @ApiResponse(code = 500, message = "Server error")
+    })
     public ResponseEntity<Order> addOrder(@Valid @RequestBody Order order) {
         try {
             Order created = orderRepository.save(order);
@@ -68,7 +89,7 @@ public class OrderController {
             logger.debug("Added order {}", created);
             //
             List<Order> relatedOrders = orderRepository.findBySecurityIdAndTypeAndFulfilled(created.getSecurityId(),
-                    EOrderType.BUY.equals(created.getType()) ? EOrderType.SELL : EOrderType.BUY,
+                    EOrderType.BUY == created.getType() ? EOrderType.SELL : EOrderType.BUY,
                     false);
             manageTrading(created, relatedOrders);
             //
@@ -81,7 +102,7 @@ public class OrderController {
     private void manageTrading(Order created, List<Order> relatedOrders) {
         if (!relatedOrders.isEmpty()) {
             logger.info("Found related order(s). Created: {}; related found: {}", created, relatedOrders);
-            if (EOrderType.BUY.equals(created.getType())) {
+            if (EOrderType.BUY == created.getType()) {
                 // I created a BUY order and now I found all related SELL order(s)
                 // Find the one with min price
                 Order related = orderRepository.getOne(relatedOrders.stream()

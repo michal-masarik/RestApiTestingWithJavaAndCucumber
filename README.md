@@ -45,17 +45,6 @@ mvn test
 Note that here the whole application has been structured to have it first running
 (see previous Chapter), then tested it. In this way, you can eventually verify manually the database content.
 
-Optionally, you can remove the comment to annotation `@SpringBootTest` in file
-`CucumberTest.java`, so you can run the test without explicitly having the application running.
-
-In this way, by invoking
-
-```shell
-mvn -U clean verify
-```
-
-you can build and test directly the code.
-
 ## Verify database content
 
 When the application is running, you can check the database content with a browser: http://localhost:8080/h2-console/
@@ -72,65 +61,13 @@ When the application is running, you can check the database content with a brows
 
 ## API
 
-All the APIs discussed in the following Chapters receive and return data in JSON format.
-
-### Users
-
-These APIs can be found in `/api/users`, where we have:
-
-* `GET /api/users`: returns a list of users (potentially empty)
-* `GET /api/users/{id}`: returns a specific user having a given identifier
-* `POST /api/users`: creates a new user, e.g.:
-  ```json
-  { "username": "something", "password": "my_password" }
-  ```
-  The password is then hashed to SHA-256.
-
-### Securities
-
-These APIs can be found in `/api/securities`, where we have:
-
-* `GET /api/securities`: returns a list of securities (potentially empty)
-* `GET /api/securities/{id}`: returns a specific security having a given identifier
-* `POST /api/securities`: creates a new security, e.g.:
-  ```json
-  { "name": "ABC" }
-  ```
-
-### Orders
-
-These APIs can be found in `/api/orders`, where we have:
-
-* `GET /api/orders`: returns a list of orders (potentially empty)
-* `GET /api/orders/{id}`: returns a specific order having a given identifier
-* `POST /api/orders`: creates a new order, e.g.:
-  ```json
-  {
-    "userId": "a7e02ce2-3b28-4ade-9fce-f39234e3df57",
-    "securityId": "c079d2cd-29e3-4d20-b696-4eab84c119f5",
-    "type": "BUY",
-    "price": 101.3,
-    "quantity": 50
-  }
-  ```
-  `type` can be:
-    * `BUY`
-    * `SELL`
-      If there is an existing matching order, a new trade is automatically created.
-
-### Trades
-
-These APIs can bve found in `/api/trades`, where we have:
-
-* `GET /api/trades`: returns a list of trades (potentially empty)
-* `GET /api/trades/{id}`: returns a specific trade having a given identifier
-* `GET /api/trades/orderBuyId/{orderBuyId}/orderSellId/{orderSellId}`: returns a trade having a given buy oder
-  identifier (`orderBuyId`) and a sell order identifier (`orderSellId`)
+Once the application is started, you can check all the available APIs and models by using
+the [Swagger interface](http://localhost:8080/swagger-ui/).
 
 ## Improvements
 
 1. Unit tests!!!
-2. Swagger: API documentation and usage
-3. Foreign keys and eventually better constraints on DB schema, so we avoid adding corrupted data in the database (e.g.
+2. Foreign keys and eventually better constraints on DB schema, so we avoid adding corrupted data in the database (e.g.
    orders related to not existing users/securities...)
-4. Introduce test parameters (e.g. base URL) to be read from a configuration file
+3. Introduce test parameters (e.g. base URL) to be read from a configuration file
+4. Fix errors notified by SpotBugs
