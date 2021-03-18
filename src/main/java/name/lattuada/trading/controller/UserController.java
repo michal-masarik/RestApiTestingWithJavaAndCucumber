@@ -7,6 +7,8 @@ import io.swagger.annotations.ApiResponses;
 import name.lattuada.trading.model.User;
 import name.lattuada.trading.repository.IUserRepository;
 import org.apache.commons.codec.digest.DigestUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -23,6 +25,8 @@ import java.util.UUID;
 @Api()
 public class UserController {
 
+    private static final Logger logger = LoggerFactory.getLogger(UserController.class);
+
     @Autowired
     IUserRepository userRepository;
 
@@ -37,10 +41,13 @@ public class UserController {
         try {
             List<User> userList = userRepository.findAll();
             if (userList.isEmpty()) {
+                logger.info("No users found");
                 return new ResponseEntity<>(HttpStatus.NO_CONTENT);
             }
+            logger.debug("Found {} users: {}", userList.size(), userList);
             return new ResponseEntity<>(userList, HttpStatus.OK);
         } catch (Exception e) {
+            logger.error("Exception caught", e);
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
@@ -55,9 +62,15 @@ public class UserController {
     public ResponseEntity<User> getUserById(@PathVariable("id") UUID uuid) {
         try {
             Optional<User> optUser = userRepository.findById(uuid);
-            return optUser.map(user -> new ResponseEntity<>(user, HttpStatus.OK))
-                    .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
+            return optUser.map(user -> {
+                logger.debug("User found: {}", user);
+                return new ResponseEntity<>(user, HttpStatus.OK);
+            }).orElseGet(() -> {
+                logger.warn("No user found having id {}", uuid);
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            });
         } catch (Exception e) {
+            logger.error("Exception caught", e);
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
@@ -75,8 +88,10 @@ public class UserController {
             // Hash password with SHA-256
             user.setPassword(DigestUtils.sha256Hex(user.getPassword()));
             User created = userRepository.save(user);
+            logger.info("Added user {}", created);
             return new ResponseEntity<>(created, HttpStatus.CREATED);
         } catch (Exception e) {
+            logger.error("Exception caught", e);
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }

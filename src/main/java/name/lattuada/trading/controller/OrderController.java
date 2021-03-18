@@ -49,6 +49,7 @@ public class OrderController {
             logger.debug("Found {} orders: {}", orderList.size(), orderList);
             return new ResponseEntity<>(orderList, HttpStatus.OK);
         } catch (Exception e) {
+            logger.error("Exception caught", e);
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
@@ -71,6 +72,7 @@ public class OrderController {
                 return new ResponseEntity<>(HttpStatus.NOT_FOUND);
             });
         } catch (Exception e) {
+            logger.error("Exception caught", e);
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
@@ -86,7 +88,7 @@ public class OrderController {
         try {
             Order created = orderRepository.save(order);
             created = orderRepository.getOne(created.getId());
-            logger.debug("Added order {}", created);
+            logger.info("Added order {}", created);
             //
             List<Order> relatedOrders = orderRepository.findBySecurityIdAndTypeAndFulfilled(created.getSecurityId(),
                     EOrderType.BUY == created.getType() ? EOrderType.SELL : EOrderType.BUY,
@@ -95,6 +97,7 @@ public class OrderController {
             //
             return new ResponseEntity<>(created, HttpStatus.CREATED);
         } catch (Exception e) {
+            logger.error("Exception caught", e);
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
@@ -125,7 +128,7 @@ public class OrderController {
     }
 
     private void createTrade(Order buy, Order sell) {
-        logger.debug("It's time to trade!");
+        logger.debug("It's time to trade between buy {} and sell {}", buy, sell);
         // Create trade
         Trade trade = new Trade();
         trade.setPrice(sell.getPrice());

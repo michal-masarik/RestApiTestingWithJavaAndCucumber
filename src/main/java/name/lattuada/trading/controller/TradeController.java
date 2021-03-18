@@ -5,6 +5,8 @@ import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import name.lattuada.trading.model.Trade;
 import name.lattuada.trading.repository.ITradeRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,6 +23,8 @@ import java.util.UUID;
 @RequestMapping("/api/trades")
 public class TradeController {
 
+    private static final Logger logger = LoggerFactory.getLogger(TradeController.class);
+
     @Autowired
     ITradeRepository tradeRepository;
 
@@ -35,10 +39,13 @@ public class TradeController {
         try {
             List<Trade> tradeList = tradeRepository.findAll();
             if (tradeList.isEmpty()) {
+                logger.info("No trades found");
                 return new ResponseEntity<>(HttpStatus.NO_CONTENT);
             }
+            logger.debug("Found {} trades: {}", tradeList.size(), tradeList);
             return new ResponseEntity<>(tradeList, HttpStatus.OK);
         } catch (Exception e) {
+            logger.error("Exception caught", e);
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
@@ -53,9 +60,15 @@ public class TradeController {
     public ResponseEntity<Trade> getTradeById(@PathVariable("id") UUID uuid) {
         try {
             Optional<Trade> optTrade = tradeRepository.findById(uuid);
-            return optTrade.map(trade -> new ResponseEntity<>(trade, HttpStatus.OK))
-                    .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
+            return optTrade.map(trade -> {
+                logger.debug("Trade found: {}", trade);
+                return new ResponseEntity<>(trade, HttpStatus.OK);
+            }).orElseGet(() -> {
+                logger.warn("No trade found having id {}", uuid);
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            });
         } catch (Exception e) {
+            logger.error("Exception caught", e);
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
@@ -72,11 +85,15 @@ public class TradeController {
         try {
             List<Trade> tradeList = tradeRepository.findByOrderBuyIdAndOrderSellId(orderBuyId, orderSellId);
             if (tradeList.isEmpty()) {
+                logger.info("No trades found based on buy oder ID {} and sell order id {}", orderBuyId, orderSellId);
                 return new ResponseEntity<>(HttpStatus.NOT_FOUND);
             } else {
-                return new ResponseEntity<>(tradeList.get(0), HttpStatus.OK);
+                Trade trade = tradeList.get(0);
+                logger.info("Found a trade: {}", trade);
+                return new ResponseEntity<>(trade, HttpStatus.OK);
             }
         } catch (Exception e) {
+            logger.error("Exception caught", e);
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
