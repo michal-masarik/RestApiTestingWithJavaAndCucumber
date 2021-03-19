@@ -1,6 +1,5 @@
-package name.lattuada.trading.model;
+package name.lattuada.trading.model.entities;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -10,20 +9,24 @@ import javax.validation.constraints.NotBlank;
 import java.util.UUID;
 
 @Entity
-@Table(name = "securities")
+@Table(name = "users")
 @Getter
 @Setter
 @ToString
-public class Security {
+public class UserEntity {
 
-    @JsonInclude(JsonInclude.Include.NON_NULL)
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name = "sec_id")
+    @Column(name = "usr_id")
     private UUID id;
 
     @NotBlank
-    @Column(name = "sec_name")
-    private String name;
+    @Column(name = "usr_username")
+    private String username;
+
+    @NotBlank
+    @Column(name = "usr_password")
+    @ToString.Exclude
+    private String password;
 
 }

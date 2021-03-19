@@ -6,8 +6,11 @@ import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
-import io.cucumber.spring.CucumberContextConfiguration;
-import name.lattuada.trading.model.*;
+import name.lattuada.trading.model.EOrderType;
+import name.lattuada.trading.model.dto.OrderDTO;
+import name.lattuada.trading.model.dto.SecurityDTO;
+import name.lattuada.trading.model.dto.TradeDTO;
+import name.lattuada.trading.model.dto.UserDTO;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,10 +25,10 @@ import static org.junit.Assert.assertTrue;
 public class Steps extends RestUtility {
 
     private static final Logger logger = LoggerFactory.getLogger(CucumberTest.class);
-    private final Map<String, Security> securityMap;
-    private final Map<String, User> userMap;
-    private Order buyOrder;
-    private Order sellOrder;
+    private final Map<String, SecurityDTO> securityMap;
+    private final Map<String, UserDTO> userMap;
+    private OrderDTO buyOrder;
+    private OrderDTO sellOrder;
 
     Steps() {
         securityMap = new HashMap<>();
@@ -61,30 +64,30 @@ public class Steps extends RestUtility {
     public void aTradeOccursWithThePriceOfAndQuantityOf(Double price, Long quantity) {
         logger.trace("Got price = \"{}\"; quantity = \"{}\"",
                 price, quantity);
-        Trade trade = get("api/trades/orderBuyId/" + buyOrder.getId().toString()
+        TradeDTO trade = get("api/trades/orderBuyId/" + buyOrder.getId().toString()
                         + "/orderSellId/" + sellOrder.getId().toString(),
-                Trade.class);
+                TradeDTO.class);
         assertEquals("Price not expected", trade.getPrice(), price);
         assertEquals("Quantity not expected", trade.getQuantity(), quantity);
     }
 
     private void createUser(String userName1) throws JsonProcessingException {
-        User user1 = new User();
+        UserDTO user1 = new UserDTO();
         user1.setUsername(userName1);
         user1.setPassword(RandomStringUtils.randomAlphanumeric(64));
-        User user1Returned = post("api/users",
+        UserDTO user1Returned = post("api/users",
                 new ObjectMapper().writer().writeValueAsString(user1),
-                User.class);
+                UserDTO.class);
         userMap.put(userName1, user1Returned);
         logger.info("User created: {}", user1Returned);
     }
 
     private void createSecurity(String securityName) throws JsonProcessingException {
-        Security security = new Security();
+        SecurityDTO security = new SecurityDTO();
         security.setName(securityName);
-        Security securityReturned = post("api/securities",
+        SecurityDTO securityReturned = post("api/securities",
                 new ObjectMapper().writer().writeValueAsString(security),
-                Security.class);
+                SecurityDTO.class);
         securityMap.put(securityName, securityReturned);
         logger.info("Security created: {}", securityReturned);
     }
@@ -94,15 +97,15 @@ public class Steps extends RestUtility {
                              String securityName,
                              Double price,
                              Long quantity) throws JsonProcessingException {
-        Order order = new Order();
+        OrderDTO order = new OrderDTO();
         order.setUserId(userMap.get(userName).getId());
         order.setSecurityId(securityMap.get(securityName).getId());
         order.setType(orderType);
         order.setPrice(price);
         order.setQuantity(quantity);
-        Order orderReturned = post("api/orders",
+        OrderDTO orderReturned = post("api/orders",
                 new ObjectMapper().writer().writeValueAsString(order),
-                Order.class);
+                OrderDTO.class);
         if (EOrderType.BUY.equals(orderType)) {
             buyOrder = orderReturned;
         } else {

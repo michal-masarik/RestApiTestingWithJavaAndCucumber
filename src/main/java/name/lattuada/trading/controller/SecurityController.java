@@ -3,7 +3,9 @@ package name.lattuada.trading.controller;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
-import name.lattuada.trading.model.Security;
+import name.lattuada.trading.model.Mapper;
+import name.lattuada.trading.model.dto.SecurityDTO;
+import name.lattuada.trading.model.entities.SecurityEntity;
 import name.lattuada.trading.repository.ISecurityRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,15 +37,15 @@ public class SecurityController {
             @ApiResponse(code = 204, message = "No securities"),
             @ApiResponse(code = 500, message = "Server error")
     })
-    public ResponseEntity<List<Security>> getSecurities() {
+    public ResponseEntity<List<SecurityDTO>> getSecurities() {
         try {
-            List<Security> securityList = securityRepository.findAll();
+            List<SecurityEntity> securityList = securityRepository.findAll();
             if (securityList.isEmpty()) {
                 logger.info("No securities found");
                 return new ResponseEntity<>(HttpStatus.NO_CONTENT);
             }
             logger.debug("Found {} securities: {}", securityList.size(), securityList);
-            return new ResponseEntity<>(securityList, HttpStatus.OK);
+            return new ResponseEntity<>(Mapper.mapAll(securityList, SecurityDTO.class), HttpStatus.OK);
         } catch (Exception e) {
             logger.error(EXCEPTION_CAUGHT, e);
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
@@ -57,12 +59,12 @@ public class SecurityController {
             @ApiResponse(code = 404, message = "No securities found"),
             @ApiResponse(code = 500, message = "Server error")
     })
-    public ResponseEntity<Security> getSecurityById(@PathVariable("id") UUID uuid) {
+    public ResponseEntity<SecurityDTO> getSecurityById(@PathVariable("id") UUID uuid) {
         try {
-            Optional<Security> optSecurity = securityRepository.findById(uuid);
+            Optional<SecurityEntity> optSecurity = securityRepository.findById(uuid);
             return optSecurity.map(security -> {
                 logger.debug("Security found: {}", security);
-                return new ResponseEntity<>(security, HttpStatus.OK);
+                return new ResponseEntity<>(Mapper.map(security, SecurityDTO.class), HttpStatus.OK);
             }).orElseGet(() -> {
                 logger.warn("No security found having id {}", uuid);
                 return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -80,11 +82,11 @@ public class SecurityController {
             @ApiResponse(code = 201, message = "Security created"),
             @ApiResponse(code = 500, message = "Server error")
     })
-    public ResponseEntity<Security> addSecurity(@Valid @RequestBody Security security) {
+    public ResponseEntity<SecurityDTO> addSecurity(@Valid @RequestBody SecurityDTO security) {
         try {
-            Security created = securityRepository.save(security);
+            SecurityEntity created = securityRepository.save(Mapper.map(security, SecurityEntity.class));
             logger.info("Added security {}", created);
-            return new ResponseEntity<>(created, HttpStatus.CREATED);
+            return new ResponseEntity<>(Mapper.map(created, SecurityDTO.class), HttpStatus.CREATED);
         } catch (Exception e) {
             logger.error(EXCEPTION_CAUGHT, e);
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);

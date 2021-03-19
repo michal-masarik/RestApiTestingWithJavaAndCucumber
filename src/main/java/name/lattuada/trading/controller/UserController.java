@@ -4,7 +4,9 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
-import name.lattuada.trading.model.User;
+import name.lattuada.trading.model.Mapper;
+import name.lattuada.trading.model.dto.UserDTO;
+import name.lattuada.trading.model.entities.UserEntity;
 import name.lattuada.trading.repository.IUserRepository;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.slf4j.Logger;
@@ -29,7 +31,7 @@ public class UserController {
     private static final String EXCEPTION_CAUGHT = "Exception caught";
 
     @Autowired
-    IUserRepository userRepository;
+    private IUserRepository userRepository;
 
     @GetMapping()
     @ApiOperation(value = "Get list of users",
@@ -38,15 +40,16 @@ public class UserController {
             @ApiResponse(code = 204, message = "No users"),
             @ApiResponse(code = 500, message = "Server error")
     })
-    public ResponseEntity<List<User>> getUsers() {
+    public ResponseEntity<List<UserDTO>> getUsers() {
         try {
-            List<User> userList = userRepository.findAll();
+            List<UserEntity> userList = userRepository.findAll();
             if (userList.isEmpty()) {
                 logger.info("No users found");
                 return new ResponseEntity<>(HttpStatus.NO_CONTENT);
             }
             logger.debug("Found {} users: {}", userList.size(), userList);
-            return new ResponseEntity<>(userList, HttpStatus.OK);
+            return new ResponseEntity<>(Mapper.mapAll(userList, UserDTO.class),
+                    HttpStatus.OK);
         } catch (Exception e) {
             logger.error(EXCEPTION_CAUGHT, e);
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
@@ -60,12 +63,12 @@ public class UserController {
             @ApiResponse(code = 404, message = "No users found"),
             @ApiResponse(code = 500, message = "Server error")
     })
-    public ResponseEntity<User> getUserById(@PathVariable("id") UUID uuid) {
+    public ResponseEntity<UserDTO> getUserById(@PathVariable("id") UUID uuid) {
         try {
-            Optional<User> optUser = userRepository.findById(uuid);
+            Optional<UserEntity> optUser = userRepository.findById(uuid);
             return optUser.map(user -> {
                 logger.debug("User found: {}", user);
-                return new ResponseEntity<>(user, HttpStatus.OK);
+                return new ResponseEntity<>(Mapper.map(user, UserDTO.class), HttpStatus.OK);
             }).orElseGet(() -> {
                 logger.warn("No user found having id {}", uuid);
                 return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -84,13 +87,13 @@ public class UserController {
             @ApiResponse(code = 201, message = "User created"),
             @ApiResponse(code = 500, message = "Server error")
     })
-    public ResponseEntity<User> addUser(@Valid @RequestBody User user) {
+    public ResponseEntity<UserDTO> addUser(@Valid @RequestBody UserDTO userDTO) {
         try {
             // Hash password with SHA-256
-            user.setPassword(DigestUtils.sha256Hex(user.getPassword()));
-            User created = userRepository.save(user);
+            userDTO.setPassword(DigestUtils.sha256Hex(userDTO.getPassword()));
+            UserEntity created = userRepository.save(Mapper.map(userDTO, UserEntity.class));
             logger.info("Added user {}", created);
-            return new ResponseEntity<>(created, HttpStatus.CREATED);
+            return new ResponseEntity<>(Mapper.map(created, UserDTO.class), HttpStatus.CREATED);
         } catch (Exception e) {
             logger.error(EXCEPTION_CAUGHT, e);
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);

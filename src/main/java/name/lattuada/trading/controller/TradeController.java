@@ -3,7 +3,9 @@ package name.lattuada.trading.controller;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
-import name.lattuada.trading.model.Trade;
+import name.lattuada.trading.model.Mapper;
+import name.lattuada.trading.model.dto.TradeDTO;
+import name.lattuada.trading.model.entities.TradeEntity;
 import name.lattuada.trading.repository.ITradeRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,15 +38,15 @@ public class TradeController {
             @ApiResponse(code = 204, message = "No trades"),
             @ApiResponse(code = 500, message = "Server error")
     })
-    public ResponseEntity<List<Trade>> getTrades() {
+    public ResponseEntity<List<TradeDTO>> getTrades() {
         try {
-            List<Trade> tradeList = tradeRepository.findAll();
+            List<TradeEntity> tradeList = tradeRepository.findAll();
             if (tradeList.isEmpty()) {
                 logger.info("No trades found");
                 return new ResponseEntity<>(HttpStatus.NO_CONTENT);
             }
             logger.debug("Found {} trades: {}", tradeList.size(), tradeList);
-            return new ResponseEntity<>(tradeList, HttpStatus.OK);
+            return new ResponseEntity<>(Mapper.mapAll(tradeList, TradeDTO.class), HttpStatus.OK);
         } catch (Exception e) {
             logger.error(EXCEPTION_CAUGHT, e);
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
@@ -58,12 +60,12 @@ public class TradeController {
             @ApiResponse(code = 404, message = "No trades found"),
             @ApiResponse(code = 500, message = "Server error")
     })
-    public ResponseEntity<Trade> getTradeById(@PathVariable("id") UUID uuid) {
+    public ResponseEntity<TradeDTO> getTradeById(@PathVariable("id") UUID uuid) {
         try {
-            Optional<Trade> optTrade = tradeRepository.findById(uuid);
+            Optional<TradeEntity> optTrade = tradeRepository.findById(uuid);
             return optTrade.map(trade -> {
                 logger.debug("Trade found: {}", trade);
-                return new ResponseEntity<>(trade, HttpStatus.OK);
+                return new ResponseEntity<>(Mapper.map(trade, TradeDTO.class), HttpStatus.OK);
             }).orElseGet(() -> {
                 logger.warn("No trade found having id {}", uuid);
                 return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -81,17 +83,17 @@ public class TradeController {
             @ApiResponse(code = 404, message = "No trades found"),
             @ApiResponse(code = 500, message = "Server error")
     })
-    public ResponseEntity<Trade> getTradeByBuyAndSellOrderId(@PathVariable("orderBuyId") UUID orderBuyId,
-                                                             @PathVariable("orderSellId") UUID orderSellId) {
+    public ResponseEntity<TradeDTO> getTradeByBuyAndSellOrderId(@PathVariable("orderBuyId") UUID orderBuyId,
+                                                                @PathVariable("orderSellId") UUID orderSellId) {
         try {
-            List<Trade> tradeList = tradeRepository.findByOrderBuyIdAndOrderSellId(orderBuyId, orderSellId);
+            List<TradeEntity> tradeList = tradeRepository.findByOrderBuyIdAndOrderSellId(orderBuyId, orderSellId);
             if (tradeList.isEmpty()) {
                 logger.info("No trades found based on buy oder ID {} and sell order id {}", orderBuyId, orderSellId);
                 return new ResponseEntity<>(HttpStatus.NOT_FOUND);
             } else {
-                Trade trade = tradeList.get(0);
+                TradeEntity trade = tradeList.get(0);
                 logger.info("Found a trade: {}", trade);
-                return new ResponseEntity<>(trade, HttpStatus.OK);
+                return new ResponseEntity<>(Mapper.map(trade, TradeDTO.class), HttpStatus.OK);
             }
         } catch (Exception e) {
             logger.error(EXCEPTION_CAUGHT, e);

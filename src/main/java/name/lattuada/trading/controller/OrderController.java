@@ -4,8 +4,10 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import name.lattuada.trading.model.EOrderType;
-import name.lattuada.trading.model.Order;
-import name.lattuada.trading.model.Trade;
+import name.lattuada.trading.model.Mapper;
+import name.lattuada.trading.model.dto.OrderDTO;
+import name.lattuada.trading.model.entities.OrderEntity;
+import name.lattuada.trading.model.entities.TradeEntity;
 import name.lattuada.trading.repository.IOrderRepository;
 import name.lattuada.trading.repository.ITradeRepository;
 import org.slf4j.Logger;
@@ -40,15 +42,15 @@ public class OrderController {
             @ApiResponse(code = 204, message = "No orders"),
             @ApiResponse(code = 500, message = "Server error")
     })
-    public ResponseEntity<List<Order>> getOrders() {
+    public ResponseEntity<List<OrderDTO>> getOrders() {
         try {
-            List<Order> orderList = orderRepository.findAll();
+            List<OrderEntity> orderList = orderRepository.findAll();
             if (orderList.isEmpty()) {
                 logger.info("No orders found");
                 return new ResponseEntity<>(HttpStatus.NO_CONTENT);
             }
             logger.debug("Found {} orders: {}", orderList.size(), orderList);
-            return new ResponseEntity<>(orderList, HttpStatus.OK);
+            return new ResponseEntity<>(Mapper.mapAll(orderList, OrderDTO.class), HttpStatus.OK);
         } catch (Exception e) {
             logger.error(EXCEPTION_CAUGHT, e);
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
@@ -62,12 +64,12 @@ public class OrderController {
             @ApiResponse(code = 404, message = "No orders found"),
             @ApiResponse(code = 500, message = "Server error")
     })
-    public ResponseEntity<Order> getOrderById(@PathVariable("id") UUID uuid) {
+    public ResponseEntity<OrderDTO> getOrderById(@PathVariable("id") UUID uuid) {
         try {
-            Optional<Order> optOrder = orderRepository.findById(uuid);
+            Optional<OrderEntity> optOrder = orderRepository.findById(uuid);
             return optOrder.map(order -> {
                 logger.debug("Order found: {}", order);
-                return new ResponseEntity<>(order, HttpStatus.OK);
+                return new ResponseEntity<>(Mapper.map(order, OrderDTO.class), HttpStatus.OK);
             }).orElseGet(() -> {
                 logger.warn("No order found having id {}", uuid);
                 return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -85,32 +87,32 @@ public class OrderController {
             @ApiResponse(code = 201, message = "Order created"),
             @ApiResponse(code = 500, message = "Server error")
     })
-    public ResponseEntity<Order> addOrder(@Valid @RequestBody Order order) {
+    public ResponseEntity<OrderDTO> addOrder(@Valid @RequestBody OrderDTO order) {
         try {
-            Order created = orderRepository.save(order);
+            OrderEntity created = orderRepository.save(Mapper.map(order, OrderEntity.class));
             created = orderRepository.getOne(created.getId());
             logger.info("Added order {}", created);
             //
-            List<Order> relatedOrders = orderRepository.findBySecurityIdAndTypeAndFulfilled(created.getSecurityId(),
+            List<OrderEntity> relatedOrders = orderRepository.findBySecurityIdAndTypeAndFulfilled(created.getSecurityId(),
                     EOrderType.BUY == created.getType() ? EOrderType.SELL : EOrderType.BUY,
                     false);
             manageTrading(created, relatedOrders);
             //
-            return new ResponseEntity<>(created, HttpStatus.CREATED);
+            return new ResponseEntity<>(Mapper.map(created, OrderDTO.class), HttpStatus.CREATED);
         } catch (Exception e) {
             logger.error(EXCEPTION_CAUGHT, e);
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
-    private void manageTrading(Order created, List<Order> relatedOrders) {
+    private void manageTrading(OrderEntity created, List<OrderEntity> relatedOrders) {
         if (!relatedOrders.isEmpty()) {
             logger.info("Found related order(s). Created: {}; related found: {}", created, relatedOrders);
             if (EOrderType.BUY == created.getType()) {
                 // I created a BUY order and now I found all related SELL order(s)
                 // Find the one with min price
-                Order related = orderRepository.getOne(relatedOrders.stream()
-                        .min(Comparator.comparing(Order::getPrice))
+                OrderEntity related = orderRepository.getOne(relatedOrders.stream()
+                        .min(Comparator.comparing(OrderEntity::getPrice))
                         .orElseThrow(NoSuchElementException::new).getId());
                 if (created.getPrice() >= related.getPrice()) {
                     createTrade(created, related);
@@ -118,7 +120,7 @@ public class OrderController {
             } else {
                 // I created a SELL order and now I found all related BUY order(s)
                 // For sake of simplicity, I take the first one
-                Order related = orderRepository.getOne(relatedOrders.get(0).getId());
+                OrderEntity related = orderRepository.getOne(relatedOrders.get(0).getId());
                 if (created.getPrice() <= related.getPrice()) {
                     createTrade(related, created);
                 }
@@ -128,10 +130,10 @@ public class OrderController {
         }
     }
 
-    private void createTrade(Order buy, Order sell) {
+    private void createTrade(OrderEntity buy, OrderEntity sell) {
         logger.debug("It's time to trade between buy {} and sell {}", buy, sell);
         // Create trade
-        Trade trade = new Trade();
+        TradeEntity trade = new TradeEntity();
         trade.setPrice(sell.getPrice());
         trade.setQuantity(buy.getQuantity());
         trade.setOrderSellId(sell.getId());

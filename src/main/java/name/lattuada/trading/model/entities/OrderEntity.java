@@ -1,8 +1,9 @@
-package name.lattuada.trading.model;
+package name.lattuada.trading.model.entities;
 
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
+import name.lattuada.trading.model.EOrderType;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
@@ -14,7 +15,7 @@ import java.util.UUID;
 @Getter
 @Setter
 @ToString
-public class Order {
+public class OrderEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)

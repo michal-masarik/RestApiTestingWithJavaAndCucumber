@@ -1,13 +1,13 @@
 package name.lattuada.trading.repository;
 
-import name.lattuada.trading.model.Trade;
+import name.lattuada.trading.model.entities.TradeEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
 import java.util.UUID;
 
-public interface ITradeRepository extends JpaRepository<Trade, UUID> {
+public interface ITradeRepository extends JpaRepository<TradeEntity, UUID> {
 
-    List<Trade> findByOrderBuyIdAndOrderSellId(UUID orderBuyId, UUID orderSellId);
+    List<TradeEntity> findByOrderBuyIdAndOrderSellId(UUID orderBuyId, UUID orderSellId);
 
 }
