@@ -57,7 +57,7 @@ public class TradeController {
     @ApiOperation(value = "Get a specific trade",
             notes = "Returns specific trade given its id")
     @ApiResponses(value = {
-            @ApiResponse(code = 404, message = "No trades found"),
+            @ApiResponse(code = 404, message = "Trade not found"),
             @ApiResponse(code = 500, message = "Server error")
     })
     public ResponseEntity<TradeDTO> getTradeById(@PathVariable("id") UUID uuid) {
@@ -80,7 +80,7 @@ public class TradeController {
     @ApiOperation(value = "Get a specific trade based on the buy and sell order identifiers",
             notes = "Returns specific trade having a given buy order id and a sell order id")
     @ApiResponses(value = {
-            @ApiResponse(code = 404, message = "No trades found"),
+            @ApiResponse(code = 404, message = "Trade not found"),
             @ApiResponse(code = 500, message = "Server error")
     })
     public ResponseEntity<TradeDTO> getTradeByBuyAndSellOrderId(@PathVariable("orderBuyId") UUID orderBuyId,

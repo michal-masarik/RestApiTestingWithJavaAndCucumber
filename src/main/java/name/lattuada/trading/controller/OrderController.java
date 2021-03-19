@@ -61,7 +61,7 @@ public class OrderController {
     @ApiOperation(value = "Get a specific order",
             notes = "Returns specific order given its id")
     @ApiResponses(value = {
-            @ApiResponse(code = 404, message = "No orders found"),
+            @ApiResponse(code = 404, message = "Order not found"),
             @ApiResponse(code = 500, message = "Server error")
     })
     public ResponseEntity<OrderDTO> getOrderById(@PathVariable("id") UUID uuid) {

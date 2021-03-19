@@ -56,7 +56,7 @@ public class SecurityController {
     @ApiOperation(value = "Get a specific security",
             notes = "Returns specific security given its id")
     @ApiResponses(value = {
-            @ApiResponse(code = 404, message = "No securities found"),
+            @ApiResponse(code = 404, message = "Security not found"),
             @ApiResponse(code = 500, message = "Server error")
     })
     public ResponseEntity<SecurityDTO> getSecurityById(@PathVariable("id") UUID uuid) {

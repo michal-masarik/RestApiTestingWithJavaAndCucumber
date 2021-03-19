@@ -60,7 +60,7 @@ public class UserController {
     @ApiOperation(value = "Get a specific user",
             notes = "Returns specific user given his id")
     @ApiResponses(value = {
-            @ApiResponse(code = 404, message = "No users found"),
+            @ApiResponse(code = 404, message = "User not found"),
             @ApiResponse(code = 500, message = "Server error")
     })
     public ResponseEntity<UserDTO> getUserById(@PathVariable("id") UUID uuid) {
