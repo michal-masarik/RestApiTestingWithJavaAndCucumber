@@ -42,6 +42,7 @@
         <findsecbugs-plugin>1.11.0</findsecbugs-plugin>
 
         <!-- Test libraries -->
+        <junit-jupiter.version>5.7.1</junit-jupiter.version>
         <cucumber.version>6.10.2</cucumber.version>
     </properties>
 
@@ -147,18 +148,20 @@
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-api</artifactId>
-            <version>5.7.1</version>
+            <version>${junit-jupiter.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.junit.vintage</groupId>
             <artifactId>junit-vintage-engine</artifactId>
-            <version>5.7.1</version>
+            <version>${junit-jupiter.version}</version>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>io.cucumber</groupId>
             <artifactId>cucumber-spring</artifactId>
             <version>${cucumber.version}</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 
@@ -185,7 +188,7 @@
                     <dependency>
                         <groupId>org.junit.jupiter</groupId>
                         <artifactId>junit-jupiter-engine</artifactId>
-                        <version>5.7.1</version>
+                        <version>${junit-jupiter.version}</version>
                     </dependency>
                 </dependencies>
                 <configuration>

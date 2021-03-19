@@ -17,7 +17,7 @@ Maven (define the environment variable `M2_HOME` appropriately).
 Execute in a shell
 
 ```shell
-git pull https://github.com/maurizio-lattuada/trading.git
+git clone https://github.com/maurizio-lattuada/trading.git
 cd trading
 mvn -U clean verify -DskipTests
 ```
@@ -36,14 +36,26 @@ java -jar target/trading-0.0.1-SNAPSHOT.jar
 
 ## Test the code
 
-Once you launched the main application (see previous Chapter), you can test it as
+Once you launched the main application (see the previous Chapter), you can test it as
 
 ```shell
 mvn test
 ```
 
 Note that here the whole application has been structured to have it first running
-(see previous Chapter), then tested it. In this way, you can eventually verify manually the database content.
+(see the previous Chapter), then tested it via Cucumber. In this way, you can eventually verify manually the database
+content.
+
+Optionally, you can remove the comment to annotation `@SpringBootTest` in file
+`CucumberTest.java`, so you can run the test without explicitly having the application running.
+
+In this way, by invoking:
+
+```shell
+mvn -U clean verify
+```
+
+you can build and test directly the code.
 
 ## Verify database content
 

@@ -19,7 +19,6 @@ import java.util.Map;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-@CucumberContextConfiguration
 public class Steps extends RestUtility {
 
     private static final Logger logger = LoggerFactory.getLogger(CucumberTest.class);
