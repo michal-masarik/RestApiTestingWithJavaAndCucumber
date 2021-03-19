@@ -23,6 +23,7 @@ import java.util.UUID;
 public class SecurityController {
 
     private static final Logger logger = LoggerFactory.getLogger(SecurityController.class);
+    private static final String EXCEPTION_CAUGHT = "Exception caught";
 
     @Autowired
     ISecurityRepository securityRepository;
@@ -44,7 +45,7 @@ public class SecurityController {
             logger.debug("Found {} securities: {}", securityList.size(), securityList);
             return new ResponseEntity<>(securityList, HttpStatus.OK);
         } catch (Exception e) {
-            logger.error("Exception caught", e);
+            logger.error(EXCEPTION_CAUGHT, e);
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
@@ -67,7 +68,7 @@ public class SecurityController {
                 return new ResponseEntity<>(HttpStatus.NOT_FOUND);
             });
         } catch (Exception e) {
-            logger.error("Exception caught", e);
+            logger.error(EXCEPTION_CAUGHT, e);
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
@@ -85,7 +86,7 @@ public class SecurityController {
             logger.info("Added security {}", created);
             return new ResponseEntity<>(created, HttpStatus.CREATED);
         } catch (Exception e) {
-            logger.error("Exception caught", e);
+            logger.error(EXCEPTION_CAUGHT, e);
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }

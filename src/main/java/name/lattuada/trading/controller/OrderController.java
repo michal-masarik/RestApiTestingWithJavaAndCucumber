@@ -25,6 +25,7 @@ import java.util.*;
 public class OrderController {
 
     private static final Logger logger = LoggerFactory.getLogger(OrderController.class);
+    private static final String EXCEPTION_CAUGHT = "Exception caught";
 
     @Autowired
     IOrderRepository orderRepository;
@@ -49,7 +50,7 @@ public class OrderController {
             logger.debug("Found {} orders: {}", orderList.size(), orderList);
             return new ResponseEntity<>(orderList, HttpStatus.OK);
         } catch (Exception e) {
-            logger.error("Exception caught", e);
+            logger.error(EXCEPTION_CAUGHT, e);
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
@@ -72,7 +73,7 @@ public class OrderController {
                 return new ResponseEntity<>(HttpStatus.NOT_FOUND);
             });
         } catch (Exception e) {
-            logger.error("Exception caught", e);
+            logger.error(EXCEPTION_CAUGHT, e);
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
@@ -97,7 +98,7 @@ public class OrderController {
             //
             return new ResponseEntity<>(created, HttpStatus.CREATED);
         } catch (Exception e) {
-            logger.error("Exception caught", e);
+            logger.error(EXCEPTION_CAUGHT, e);
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }

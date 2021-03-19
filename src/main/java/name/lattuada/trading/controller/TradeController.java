@@ -24,6 +24,7 @@ import java.util.UUID;
 public class TradeController {
 
     private static final Logger logger = LoggerFactory.getLogger(TradeController.class);
+    private static final String EXCEPTION_CAUGHT = "Exception caught";
 
     @Autowired
     ITradeRepository tradeRepository;
@@ -45,7 +46,7 @@ public class TradeController {
             logger.debug("Found {} trades: {}", tradeList.size(), tradeList);
             return new ResponseEntity<>(tradeList, HttpStatus.OK);
         } catch (Exception e) {
-            logger.error("Exception caught", e);
+            logger.error(EXCEPTION_CAUGHT, e);
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
@@ -68,7 +69,7 @@ public class TradeController {
                 return new ResponseEntity<>(HttpStatus.NOT_FOUND);
             });
         } catch (Exception e) {
-            logger.error("Exception caught", e);
+            logger.error(EXCEPTION_CAUGHT, e);
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
@@ -93,7 +94,7 @@ public class TradeController {
                 return new ResponseEntity<>(trade, HttpStatus.OK);
             }
         } catch (Exception e) {
-            logger.error("Exception caught", e);
+            logger.error(EXCEPTION_CAUGHT, e);
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }

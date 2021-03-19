@@ -26,6 +26,7 @@ import java.util.UUID;
 public class UserController {
 
     private static final Logger logger = LoggerFactory.getLogger(UserController.class);
+    private static final String EXCEPTION_CAUGHT = "Exception caught";
 
     @Autowired
     IUserRepository userRepository;
@@ -47,7 +48,7 @@ public class UserController {
             logger.debug("Found {} users: {}", userList.size(), userList);
             return new ResponseEntity<>(userList, HttpStatus.OK);
         } catch (Exception e) {
-            logger.error("Exception caught", e);
+            logger.error(EXCEPTION_CAUGHT, e);
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
@@ -70,7 +71,7 @@ public class UserController {
                 return new ResponseEntity<>(HttpStatus.NOT_FOUND);
             });
         } catch (Exception e) {
-            logger.error("Exception caught", e);
+            logger.error(EXCEPTION_CAUGHT, e);
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
@@ -91,7 +92,7 @@ public class UserController {
             logger.info("Added user {}", created);
             return new ResponseEntity<>(created, HttpStatus.CREATED);
         } catch (Exception e) {
-            logger.error("Exception caught", e);
+            logger.error(EXCEPTION_CAUGHT, e);
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
