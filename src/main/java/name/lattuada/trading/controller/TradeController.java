@@ -92,7 +92,7 @@ public class TradeController {
         try {
             List<TradeEntity> tradeList = tradeRepository.findByOrderBuyIdAndOrderSellId(orderBuyId, orderSellId);
             if (tradeList.isEmpty()) {
-                logger.info("No trades found based on buy oder ID {} and sell order id {}", orderBuyId, orderSellId);
+                logger.info("No trades found based on buy oder id {} and sell order id {}", orderBuyId, orderSellId);
                 return new ResponseEntity<>(HttpStatus.NOT_FOUND);
             } else {
                 TradeEntity trade = tradeList.get(0);

@@ -11,3 +11,9 @@ Feature: 00 Smoke Tests
     When user "User2" puts a "sell" order for security "SEC" with a price of 100 and a quantity of 100
     And user "User1" puts a "buy" order for security "SEC" with a price of 101 and quantity of 50
     Then a trade occurs with the price of 100 and quantity of 50
+
+  Scenario: No trades occur
+    Given one security "NTR" and two users "User1" and "User2" exist
+    When user "User2" puts a "sell" order for security "NTR" with a price of 100 and a quantity of 100
+    And user "User1" puts a "buy" order for security "NTR" with a price of 99 and quantity of 50
+    Then no trades occur

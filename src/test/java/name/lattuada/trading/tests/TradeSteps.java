@@ -12,8 +12,10 @@ import name.lattuada.trading.model.dto.SecurityDTO;
 import name.lattuada.trading.model.dto.TradeDTO;
 import name.lattuada.trading.model.dto.UserDTO;
 import org.apache.commons.lang3.RandomStringUtils;
+import org.assertj.core.api.Assertions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.web.client.HttpClientErrorException;
 
 import java.util.HashMap;
 import java.util.Locale;
@@ -22,7 +24,7 @@ import java.util.Map;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-public class Steps extends RestUtility {
+public class TradeSteps extends RestUtility {
 
     private static final Logger logger = LoggerFactory.getLogger(CucumberTest.class);
     private final Map<String, SecurityDTO> securityMap;
@@ -30,7 +32,7 @@ public class Steps extends RestUtility {
     private OrderDTO buyOrder;
     private OrderDTO sellOrder;
 
-    Steps() {
+    TradeSteps() {
         securityMap = new HashMap<>();
         userMap = new HashMap<>();
     }
@@ -69,6 +71,13 @@ public class Steps extends RestUtility {
                 TradeDTO.class);
         assertEquals("Price not expected", trade.getPrice(), price);
         assertEquals("Quantity not expected", trade.getQuantity(), quantity);
+    }
+
+    @Then("no trades occur")
+    public void noTradesOccur() {
+        Assertions.assertThatThrownBy(() -> get("api/trades/orderBuyId/" + buyOrder.getId().toString()
+                        + "/orderSellId/" + sellOrder.getId().toString(),
+                TradeDTO.class)).isInstanceOf(HttpClientErrorException.NotFound.class);
     }
 
     private void createUser(String userName) throws JsonProcessingException {
