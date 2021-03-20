@@ -71,22 +71,22 @@ public class Steps extends RestUtility {
         assertEquals("Quantity not expected", trade.getQuantity(), quantity);
     }
 
-    private void createUser(String userName1) throws JsonProcessingException {
-        UserDTO user1 = new UserDTO();
-        user1.setUsername(userName1);
-        user1.setPassword(RandomStringUtils.randomAlphanumeric(64));
-        UserDTO user1Returned = post("api/users",
-                new ObjectMapper().writer().writeValueAsString(user1),
+    private void createUser(String userName) throws JsonProcessingException {
+        UserDTO userDTO = new UserDTO();
+        userDTO.setUsername(userName);
+        userDTO.setPassword(RandomStringUtils.randomAlphanumeric(64));
+        UserDTO userReturned = post("api/users",
+                new ObjectMapper().writer().writeValueAsString(userDTO),
                 UserDTO.class);
-        userMap.put(userName1, user1Returned);
-        logger.info("User created: {}", user1Returned);
+        userMap.put(userName, userReturned);
+        logger.info("User created: {}", userReturned);
     }
 
     private void createSecurity(String securityName) throws JsonProcessingException {
-        SecurityDTO security = new SecurityDTO();
-        security.setName(securityName);
+        SecurityDTO securityDTO = new SecurityDTO();
+        securityDTO.setName(securityName);
         SecurityDTO securityReturned = post("api/securities",
-                new ObjectMapper().writer().writeValueAsString(security),
+                new ObjectMapper().writer().writeValueAsString(securityDTO),
                 SecurityDTO.class);
         securityMap.put(securityName, securityReturned);
         logger.info("Security created: {}", securityReturned);
@@ -97,14 +97,14 @@ public class Steps extends RestUtility {
                              String securityName,
                              Double price,
                              Long quantity) throws JsonProcessingException {
-        OrderDTO order = new OrderDTO();
-        order.setUserId(userMap.get(userName).getId());
-        order.setSecurityId(securityMap.get(securityName).getId());
-        order.setType(orderType);
-        order.setPrice(price);
-        order.setQuantity(quantity);
+        OrderDTO orderDTO = new OrderDTO();
+        orderDTO.setUserId(userMap.get(userName).getId());
+        orderDTO.setSecurityId(securityMap.get(securityName).getId());
+        orderDTO.setType(orderType);
+        orderDTO.setPrice(price);
+        orderDTO.setQuantity(quantity);
         OrderDTO orderReturned = post("api/orders",
-                new ObjectMapper().writer().writeValueAsString(order),
+                new ObjectMapper().writer().writeValueAsString(orderDTO),
                 OrderDTO.class);
         if (EOrderType.BUY.equals(orderType)) {
             buyOrder = orderReturned;

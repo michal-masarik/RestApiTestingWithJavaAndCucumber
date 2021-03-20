@@ -15,7 +15,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Constraint(validatedBy = UUIDValidator.class)
 public @interface UUID {
 
-    String message() default "invalid.uuid}";
+    String message() default "{invalid.uuid}";
 
     Class<?>[] groups() default {};
 

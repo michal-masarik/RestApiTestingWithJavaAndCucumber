@@ -49,7 +49,11 @@ public class OrderController {
                 logger.info("No orders found");
                 return new ResponseEntity<>(HttpStatus.NO_CONTENT);
             }
-            logger.debug("Found {} orders: {}", orderList.size(), orderList);
+            if (logger.isDebugEnabled()) {
+                logger.debug("Found {} orders: {}", orderList.size(), orderList);
+            } else {
+                logger.info("Found {} orders", orderList.size());
+            }
             return new ResponseEntity<>(Mapper.mapAll(orderList, OrderDTO.class), HttpStatus.OK);
         } catch (Exception e) {
             logger.error(EXCEPTION_CAUGHT, e);
@@ -68,10 +72,10 @@ public class OrderController {
         try {
             Optional<OrderEntity> optOrder = orderRepository.findById(uuid);
             return optOrder.map(order -> {
-                logger.debug("Order found: {}", order);
+                logger.info("Order found having id: {}", uuid);
                 return new ResponseEntity<>(Mapper.map(order, OrderDTO.class), HttpStatus.OK);
             }).orElseGet(() -> {
-                logger.warn("No order found having id {}", uuid);
+                logger.info("No order found having id {}", uuid);
                 return new ResponseEntity<>(HttpStatus.NOT_FOUND);
             });
         } catch (Exception e) {
@@ -91,7 +95,7 @@ public class OrderController {
         try {
             OrderEntity created = orderRepository.save(Mapper.map(order, OrderEntity.class));
             created = orderRepository.getOne(created.getId());
-            logger.info("Added order {}", created);
+            logger.info("Added order: {}", created);
             //
             List<OrderEntity> relatedOrders = orderRepository.findBySecurityIdAndTypeAndFulfilled(created.getSecurityId(),
                     EOrderType.BUY == created.getType() ? EOrderType.SELL : EOrderType.BUY,

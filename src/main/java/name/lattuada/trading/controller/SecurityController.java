@@ -44,7 +44,11 @@ public class SecurityController {
                 logger.info("No securities found");
                 return new ResponseEntity<>(HttpStatus.NO_CONTENT);
             }
-            logger.debug("Found {} securities: {}", securityList.size(), securityList);
+            if (logger.isDebugEnabled()) {
+                logger.debug("Found {} securities: {}", securityList.size(), securityList);
+            } else {
+                logger.info("Found {} securities", securityList.size());
+            }
             return new ResponseEntity<>(Mapper.mapAll(securityList, SecurityDTO.class), HttpStatus.OK);
         } catch (Exception e) {
             logger.error(EXCEPTION_CAUGHT, e);
@@ -63,10 +67,10 @@ public class SecurityController {
         try {
             Optional<SecurityEntity> optSecurity = securityRepository.findById(uuid);
             return optSecurity.map(security -> {
-                logger.debug("Security found: {}", security);
+                logger.info("Security found having id: {}", uuid);
                 return new ResponseEntity<>(Mapper.map(security, SecurityDTO.class), HttpStatus.OK);
             }).orElseGet(() -> {
-                logger.warn("No security found having id {}", uuid);
+                logger.info("No security found having id {}", uuid);
                 return new ResponseEntity<>(HttpStatus.NOT_FOUND);
             });
         } catch (Exception e) {
@@ -85,7 +89,7 @@ public class SecurityController {
     public ResponseEntity<SecurityDTO> addSecurity(@Valid @RequestBody SecurityDTO security) {
         try {
             SecurityEntity created = securityRepository.save(Mapper.map(security, SecurityEntity.class));
-            logger.info("Added security {}", created);
+            logger.info("Added security: {}", created);
             return new ResponseEntity<>(Mapper.map(created, SecurityDTO.class), HttpStatus.CREATED);
         } catch (Exception e) {
             logger.error(EXCEPTION_CAUGHT, e);

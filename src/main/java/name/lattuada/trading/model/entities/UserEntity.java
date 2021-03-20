@@ -5,7 +5,6 @@ import lombok.Setter;
 import lombok.ToString;
 
 import javax.persistence.*;
-import javax.validation.constraints.NotBlank;
 import java.util.UUID;
 
 @Entity
@@ -20,11 +19,9 @@ public class UserEntity {
     @Column(name = "usr_id")
     private UUID id;
 
-    @NotBlank
     @Column(name = "usr_username")
     private String username;
 
-    @NotBlank
     @Column(name = "usr_password")
     @ToString.Exclude
     private String password;

@@ -45,7 +45,11 @@ public class TradeController {
                 logger.info("No trades found");
                 return new ResponseEntity<>(HttpStatus.NO_CONTENT);
             }
-            logger.debug("Found {} trades: {}", tradeList.size(), tradeList);
+            if (logger.isDebugEnabled()) {
+                logger.debug("Found {} trades: {}", tradeList.size(), tradeList);
+            } else {
+                logger.info("Found {} trades", tradeList.size());
+            }
             return new ResponseEntity<>(Mapper.mapAll(tradeList, TradeDTO.class), HttpStatus.OK);
         } catch (Exception e) {
             logger.error(EXCEPTION_CAUGHT, e);
@@ -64,10 +68,10 @@ public class TradeController {
         try {
             Optional<TradeEntity> optTrade = tradeRepository.findById(uuid);
             return optTrade.map(trade -> {
-                logger.debug("Trade found: {}", trade);
+                logger.info("Trade found with id: {}", uuid);
                 return new ResponseEntity<>(Mapper.map(trade, TradeDTO.class), HttpStatus.OK);
             }).orElseGet(() -> {
-                logger.warn("No trade found having id {}", uuid);
+                logger.info("No trade found having id {}", uuid);
                 return new ResponseEntity<>(HttpStatus.NOT_FOUND);
             });
         } catch (Exception e) {

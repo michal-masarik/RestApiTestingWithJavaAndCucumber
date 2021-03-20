@@ -9,7 +9,7 @@ public class UUIDValidator implements ConstraintValidator<name.lattuada.trading.
 
     @Override
     public void initialize(name.lattuada.trading.validator.UUID notUsed) {
-        // Non needed
+        // Not needed
     }
 
     @Override
