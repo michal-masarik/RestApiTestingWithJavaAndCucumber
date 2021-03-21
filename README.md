@@ -2,14 +2,14 @@
 
 This is a simple trading application.
 
-Being a first draft, it uses an in-memory H2 database. Neither the schema, nor the data are created.
+Being a first draft, it uses an in-memory H2 database. Neither the schema, nor the data are explicitly created.
 
 ## Required tools and libraries
 
 1. At least [JDK 11](https://www.oracle.com/java/technologies/javase-downloads.html#JDK11)
 2. [Maven 3.6.3](https://maven.apache.org/download.cgi)
 
-Install both the JDK (define the environment variable `JAVA_HOME` appropriately and set it in your `PATH` one), then
+Install both the JDK (define the environment variable `JAVA_HOME` appropriately), then
 Maven (define the environment variable `M2_HOME` appropriately).
 
 ## Build the code
@@ -87,4 +87,4 @@ the [Swagger interface](http://localhost:8080/swagger-ui/).
 2. Foreign keys and eventually better constraints on DB schema, so we avoid adding corrupted data in the database (e.g.
    orders related to not existing users/securities...)
 3. Introduce test parameters (e.g. base URL) to be read from a configuration file
-4. Fix errors notified by SpotBugs
+4. Fix errors notified by SpotBugs (you can check them via `mvn spotbugs:gui`)
