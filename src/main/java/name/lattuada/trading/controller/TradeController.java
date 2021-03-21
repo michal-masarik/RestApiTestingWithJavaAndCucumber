@@ -25,11 +25,11 @@ import java.util.UUID;
 @RequestMapping("/api/trades")
 public class TradeController {
 
-    private static final Logger logger = LoggerFactory.getLogger(TradeController.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(TradeController.class);
     private static final String EXCEPTION_CAUGHT = "Exception caught";
 
     @Autowired
-    ITradeRepository tradeRepository;
+    private ITradeRepository tradeRepository;
 
     @GetMapping()
     @ApiOperation(value = "Get list of trades",
@@ -42,17 +42,17 @@ public class TradeController {
         try {
             List<TradeEntity> tradeList = tradeRepository.findAll();
             if (tradeList.isEmpty()) {
-                logger.info("No trades found");
+                LOGGER.info("No trades found");
                 return new ResponseEntity<>(HttpStatus.NO_CONTENT);
             }
-            if (logger.isDebugEnabled()) {
-                logger.debug("Found {} trades: {}", tradeList.size(), tradeList);
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("Found {} trades: {}", tradeList.size(), tradeList);
             } else {
-                logger.info("Found {} trades", tradeList.size());
+                LOGGER.info("Found {} trades", tradeList.size());
             }
             return new ResponseEntity<>(Mapper.mapAll(tradeList, TradeDTO.class), HttpStatus.OK);
         } catch (Exception e) {
-            logger.error(EXCEPTION_CAUGHT, e);
+            LOGGER.error(EXCEPTION_CAUGHT, e);
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
@@ -68,14 +68,14 @@ public class TradeController {
         try {
             Optional<TradeEntity> optTrade = tradeRepository.findById(uuid);
             return optTrade.map(trade -> {
-                logger.info("Trade found with id: {}", uuid);
+                LOGGER.info("Trade found with id: {}", uuid);
                 return new ResponseEntity<>(Mapper.map(trade, TradeDTO.class), HttpStatus.OK);
             }).orElseGet(() -> {
-                logger.info("No trade found having id {}", uuid);
+                LOGGER.info("No trade found having id {}", uuid);
                 return new ResponseEntity<>(HttpStatus.NOT_FOUND);
             });
         } catch (Exception e) {
-            logger.error(EXCEPTION_CAUGHT, e);
+            LOGGER.error(EXCEPTION_CAUGHT, e);
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
@@ -92,15 +92,15 @@ public class TradeController {
         try {
             List<TradeEntity> tradeList = tradeRepository.findByOrderBuyIdAndOrderSellId(orderBuyId, orderSellId);
             if (tradeList.isEmpty()) {
-                logger.info("No trades found based on buy oder id {} and sell order id {}", orderBuyId, orderSellId);
+                LOGGER.info("No trades found based on buy oder id {} and sell order id {}", orderBuyId, orderSellId);
                 return new ResponseEntity<>(HttpStatus.NOT_FOUND);
             } else {
                 TradeEntity trade = tradeList.get(0);
-                logger.info("Found a trade: {}", trade);
+                LOGGER.info("Found a trade: {}", trade);
                 return new ResponseEntity<>(Mapper.map(trade, TradeDTO.class), HttpStatus.OK);
             }
         } catch (Exception e) {
-            logger.error(EXCEPTION_CAUGHT, e);
+            LOGGER.error(EXCEPTION_CAUGHT, e);
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }

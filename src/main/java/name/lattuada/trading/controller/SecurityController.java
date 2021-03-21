@@ -24,11 +24,11 @@ import java.util.UUID;
 @RequestMapping("/api/securities")
 public class SecurityController {
 
-    private static final Logger logger = LoggerFactory.getLogger(SecurityController.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SecurityController.class);
     private static final String EXCEPTION_CAUGHT = "Exception caught";
 
     @Autowired
-    ISecurityRepository securityRepository;
+    private ISecurityRepository securityRepository;
 
     @GetMapping()
     @ApiOperation(value = "Get list of securities",
@@ -41,17 +41,17 @@ public class SecurityController {
         try {
             List<SecurityEntity> securityList = securityRepository.findAll();
             if (securityList.isEmpty()) {
-                logger.info("No securities found");
+                LOGGER.info("No securities found");
                 return new ResponseEntity<>(HttpStatus.NO_CONTENT);
             }
-            if (logger.isDebugEnabled()) {
-                logger.debug("Found {} securities: {}", securityList.size(), securityList);
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("Found {} securities: {}", securityList.size(), securityList);
             } else {
-                logger.info("Found {} securities", securityList.size());
+                LOGGER.info("Found {} securities", securityList.size());
             }
             return new ResponseEntity<>(Mapper.mapAll(securityList, SecurityDTO.class), HttpStatus.OK);
         } catch (Exception e) {
-            logger.error(EXCEPTION_CAUGHT, e);
+            LOGGER.error(EXCEPTION_CAUGHT, e);
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
@@ -67,14 +67,14 @@ public class SecurityController {
         try {
             Optional<SecurityEntity> optSecurity = securityRepository.findById(uuid);
             return optSecurity.map(security -> {
-                logger.info("Security found having id: {}", uuid);
+                LOGGER.info("Security found having id: {}", uuid);
                 return new ResponseEntity<>(Mapper.map(security, SecurityDTO.class), HttpStatus.OK);
             }).orElseGet(() -> {
-                logger.info("No security found having id {}", uuid);
+                LOGGER.info("No security found having id {}", uuid);
                 return new ResponseEntity<>(HttpStatus.NOT_FOUND);
             });
         } catch (Exception e) {
-            logger.error(EXCEPTION_CAUGHT, e);
+            LOGGER.error(EXCEPTION_CAUGHT, e);
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
@@ -89,10 +89,10 @@ public class SecurityController {
     public ResponseEntity<SecurityDTO> addSecurity(@Valid @RequestBody SecurityDTO security) {
         try {
             SecurityEntity created = securityRepository.save(Mapper.map(security, SecurityEntity.class));
-            logger.info("Added security: {}", created);
+            LOGGER.info("Added security: {}", created);
             return new ResponseEntity<>(Mapper.map(created, SecurityDTO.class), HttpStatus.CREATED);
         } catch (Exception e) {
-            logger.error(EXCEPTION_CAUGHT, e);
+            LOGGER.error(EXCEPTION_CAUGHT, e);
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }

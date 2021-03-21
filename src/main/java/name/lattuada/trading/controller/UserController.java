@@ -27,7 +27,7 @@ import java.util.UUID;
 @Api()
 public class UserController {
 
-    private static final Logger logger = LoggerFactory.getLogger(UserController.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(UserController.class);
     private static final String EXCEPTION_CAUGHT = "Exception caught";
 
     @Autowired
@@ -44,18 +44,18 @@ public class UserController {
         try {
             List<UserEntity> userList = userRepository.findAll();
             if (userList.isEmpty()) {
-                logger.info("No users found");
+                LOGGER.info("No users found");
                 return new ResponseEntity<>(HttpStatus.NO_CONTENT);
             }
-            if (logger.isDebugEnabled()) {
-                logger.debug("Found {} users: {}", userList.size(), userList);
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("Found {} users: {}", userList.size(), userList);
             } else {
-                logger.info("Found {} users", userList.size());
+                LOGGER.info("Found {} users", userList.size());
             }
             return new ResponseEntity<>(Mapper.mapAll(userList, UserDTO.class),
                     HttpStatus.OK);
         } catch (Exception e) {
-            logger.error(EXCEPTION_CAUGHT, e);
+            LOGGER.error(EXCEPTION_CAUGHT, e);
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
@@ -71,14 +71,14 @@ public class UserController {
         try {
             Optional<UserEntity> optUser = userRepository.findById(uuid);
             return optUser.map(user -> {
-                logger.info("User found having id : {}", uuid);
+                LOGGER.info("User found having id : {}", uuid);
                 return new ResponseEntity<>(Mapper.map(user, UserDTO.class), HttpStatus.OK);
             }).orElseGet(() -> {
-                logger.info("No user found having id {}", uuid);
+                LOGGER.info("No user found having id {}", uuid);
                 return new ResponseEntity<>(HttpStatus.NOT_FOUND);
             });
         } catch (Exception e) {
-            logger.error(EXCEPTION_CAUGHT, e);
+            LOGGER.error(EXCEPTION_CAUGHT, e);
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
@@ -96,10 +96,10 @@ public class UserController {
             // Hash password with SHA-256
             userDTO.setPassword(DigestUtils.sha256Hex(userDTO.getPassword()));
             UserEntity created = userRepository.save(Mapper.map(userDTO, UserEntity.class));
-            logger.info("Added user: {}", created);
+            LOGGER.info("Added user: {}", created);
             return new ResponseEntity<>(Mapper.map(created, UserDTO.class), HttpStatus.CREATED);
         } catch (Exception e) {
-            logger.error(EXCEPTION_CAUGHT, e);
+            LOGGER.error(EXCEPTION_CAUGHT, e);
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }

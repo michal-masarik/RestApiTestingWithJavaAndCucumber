@@ -88,3 +88,8 @@ the [Swagger interface](http://localhost:8080/swagger-ui/).
    orders related to not existing users/securities...)
 3. Introduce test parameters (e.g. base URL) to be read from a configuration file
 4. Fix errors notified by SpotBugs (you can check them via `mvn spotbugs:gui`)
+5. Fix errors notified by Checkstyle (and eventually tune the settings file). You can check the errors via
+    ```shell
+   mvn checkstyle:checkstyle
+   ```
+   then open the HTML report located to `target/site/checkstyle.html`.

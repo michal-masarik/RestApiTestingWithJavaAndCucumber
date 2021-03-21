@@ -5,7 +5,7 @@ import javax.validation.ConstraintValidatorContext;
 import java.util.Locale;
 import java.util.UUID;
 
-public class UUIDValidator implements ConstraintValidator<name.lattuada.trading.validator.UUID, UUID> {
+public final class UUIDValidator implements ConstraintValidator<name.lattuada.trading.validator.UUID, UUID> {
 
     @Override
     public void initialize(name.lattuada.trading.validator.UUID notUsed) {

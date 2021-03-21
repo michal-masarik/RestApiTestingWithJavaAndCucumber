@@ -26,14 +26,14 @@ import java.util.*;
 @RequestMapping("/api/orders")
 public class OrderController {
 
-    private static final Logger logger = LoggerFactory.getLogger(OrderController.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(OrderController.class);
     private static final String EXCEPTION_CAUGHT = "Exception caught";
 
     @Autowired
-    IOrderRepository orderRepository;
+    private IOrderRepository orderRepository;
     @Autowired
     @Lazy
-    ITradeRepository tradeRepository;
+    private ITradeRepository tradeRepository;
 
     @GetMapping()
     @ApiOperation(value = "Get list of orders",
@@ -46,17 +46,17 @@ public class OrderController {
         try {
             List<OrderEntity> orderList = orderRepository.findAll();
             if (orderList.isEmpty()) {
-                logger.info("No orders found");
+                LOGGER.info("No orders found");
                 return new ResponseEntity<>(HttpStatus.NO_CONTENT);
             }
-            if (logger.isDebugEnabled()) {
-                logger.debug("Found {} orders: {}", orderList.size(), orderList);
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("Found {} orders: {}", orderList.size(), orderList);
             } else {
-                logger.info("Found {} orders", orderList.size());
+                LOGGER.info("Found {} orders", orderList.size());
             }
             return new ResponseEntity<>(Mapper.mapAll(orderList, OrderDTO.class), HttpStatus.OK);
         } catch (Exception e) {
-            logger.error(EXCEPTION_CAUGHT, e);
+            LOGGER.error(EXCEPTION_CAUGHT, e);
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
@@ -72,14 +72,14 @@ public class OrderController {
         try {
             Optional<OrderEntity> optOrder = orderRepository.findById(uuid);
             return optOrder.map(order -> {
-                logger.info("Order found having id: {}", uuid);
+                LOGGER.info("Order found having id: {}", uuid);
                 return new ResponseEntity<>(Mapper.map(order, OrderDTO.class), HttpStatus.OK);
             }).orElseGet(() -> {
-                logger.info("No order found having id {}", uuid);
+                LOGGER.info("No order found having id {}", uuid);
                 return new ResponseEntity<>(HttpStatus.NOT_FOUND);
             });
         } catch (Exception e) {
-            logger.error(EXCEPTION_CAUGHT, e);
+            LOGGER.error(EXCEPTION_CAUGHT, e);
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
@@ -95,7 +95,7 @@ public class OrderController {
         try {
             OrderEntity created = orderRepository.save(Mapper.map(order, OrderEntity.class));
             created = orderRepository.getOne(created.getId());
-            logger.info("Added order: {}", created);
+            LOGGER.info("Added order: {}", created);
             //
             List<OrderEntity> relatedOrders = orderRepository.findBySecurityIdAndTypeAndFulfilled(created.getSecurityId(),
                     EOrderType.BUY == created.getType() ? EOrderType.SELL : EOrderType.BUY,
@@ -104,14 +104,14 @@ public class OrderController {
             //
             return new ResponseEntity<>(Mapper.map(created, OrderDTO.class), HttpStatus.CREATED);
         } catch (Exception e) {
-            logger.error(EXCEPTION_CAUGHT, e);
+            LOGGER.error(EXCEPTION_CAUGHT, e);
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
     private void manageTrading(OrderEntity created, List<OrderEntity> relatedOrders) {
         if (!relatedOrders.isEmpty()) {
-            logger.info("Found related order(s). Created: {}; related found: {}", created, relatedOrders);
+            LOGGER.info("Found related order(s). Created: {}; related found: {}", created, relatedOrders);
             if (EOrderType.BUY == created.getType()) {
                 // I created a BUY order and now I found all related SELL order(s)
                 // Find the one with min price
@@ -130,12 +130,12 @@ public class OrderController {
                 }
             }
         } else {
-            logger.debug("No unfulfilled related orders found for securityId {}", created.getSecurityId());
+            LOGGER.debug("No unfulfilled related orders found for securityId {}", created.getSecurityId());
         }
     }
 
     private void createTrade(OrderEntity buy, OrderEntity sell) {
-        logger.debug("It's time to trade between buy {} and sell {}", buy, sell);
+        LOGGER.debug("It's time to trade between buy {} and sell {}", buy, sell);
         // Create trade
         TradeEntity trade = new TradeEntity();
         trade.setPrice(sell.getPrice());
@@ -143,14 +143,14 @@ public class OrderController {
         trade.setOrderSellId(sell.getId());
         trade.setOrderBuyId(buy.getId());
         trade = tradeRepository.save(trade);
-        logger.info("Trade has been created: {}", trade);
+        LOGGER.info("Trade has been created: {}", trade);
         // Update orders
         buy.setFulfilled(Boolean.TRUE);
         sell.setFulfilled(Boolean.TRUE);
         sell = orderRepository.save(sell);
-        logger.info("Sell order has been updated: {}", sell);
+        LOGGER.info("Sell order has been updated: {}", sell);
         buy = orderRepository.save(buy);
-        logger.info("Buy order has bee updated: {}", buy);
+        LOGGER.info("Buy order has bee updated: {}", buy);
     }
 
 }
