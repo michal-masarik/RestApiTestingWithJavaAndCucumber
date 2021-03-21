@@ -8,10 +8,10 @@ import java.util.stream.Collectors;
 
 public final class Mapper {
 
-    private static ModelMapper modelMapper;
+    private static final ModelMapper MODEL_MAPPER;
 
     static {
-        modelMapper = new ModelMapper();
+        MODEL_MAPPER = new ModelMapper();
     }
 
     private Mapper() {
@@ -19,7 +19,7 @@ public final class Mapper {
     }
 
     /**
-     * Map object of type "S" (source) to object of type "R" (result)
+     * Map object of type "S" (source) to object of type "R" (result).
      *
      * @param source
      * @param resultClass
@@ -27,12 +27,12 @@ public final class Mapper {
      * @param <S>
      * @return
      */
-    public static <R, S> R map(final S source, Class<R> resultClass) {
-        return modelMapper.map(source, resultClass);
+    public static <R, S> R map(final S source, final Class<R> resultClass) {
+        return MODEL_MAPPER.map(source, resultClass);
     }
 
     /**
-     * Map a list of objects having type "S" (source) to a list of objects having type "R" (result)
+     * Map a list of objects having type "S" (source) to a list of objects having type "R" (result).
      *
      * @param sourceList
      * @param resultClass
@@ -40,7 +40,7 @@ public final class Mapper {
      * @param <S>
      * @return
      */
-    public static <R, S> List<R> mapAll(final Collection<S> sourceList, Class<R> resultClass) {
+    public static <R, S> List<R> mapAll(final Collection<S> sourceList, final Class<R> resultClass) {
         return sourceList.stream()
                 .map(entity -> map(entity, resultClass))
                 .collect(Collectors.toList());

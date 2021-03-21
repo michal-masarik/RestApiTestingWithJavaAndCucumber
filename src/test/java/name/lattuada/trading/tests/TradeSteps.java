@@ -81,7 +81,7 @@ public class TradeSteps {
                 TradeDTO.class)).isInstanceOf(HttpClientErrorException.NotFound.class);
     }
 
-    private void createUser(String userName) throws JsonProcessingException {
+    private void createUser(String userName) {
         UserDTO userDTO = new UserDTO();
         userDTO.setUsername(userName);
         userDTO.setPassword(RandomStringUtils.randomAlphanumeric(64));
@@ -92,7 +92,7 @@ public class TradeSteps {
         logger.info("User created: {}", userReturned);
     }
 
-    private void createSecurity(String securityName) throws JsonProcessingException {
+    private void createSecurity(String securityName) {
         SecurityDTO securityDTO = new SecurityDTO();
         securityDTO.setName(securityName);
         SecurityDTO securityReturned = restUtility.post("api/securities",
@@ -106,7 +106,7 @@ public class TradeSteps {
                              EOrderType orderType,
                              String securityName,
                              Double price,
-                             Long quantity) throws JsonProcessingException {
+                             Long quantity) {
         OrderDTO orderDTO = new OrderDTO();
         orderDTO.setUserId(userMap.get(userName).getId());
         orderDTO.setSecurityId(securityMap.get(securityName).getId());
