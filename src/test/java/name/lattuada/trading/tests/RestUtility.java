@@ -5,7 +5,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.web.client.RestTemplate;
 
-public class RestUtility {
+public final class RestUtility {
 
     private final HttpHeaders headers;
     private final String baseUrl;
@@ -22,13 +22,9 @@ public class RestUtility {
         return restTemplate.getForObject(getUrl(uri), valueType);
     }
 
-    protected String post(String uri, String body) {
-        return post(uri, body, String.class);
-    }
-
-    protected <T> T post(String uri, String body, Class<T> valueType) {
-        HttpEntity<String> httpEntity = new HttpEntity<>(body, headers);
-        return restTemplate.postForObject(getUrl(uri), httpEntity, valueType);
+    protected <T, B> T post(String uri, B body, Class<T> bodyType) {
+        HttpEntity<B> httpEntity = new HttpEntity<>(body, headers);
+        return restTemplate.postForObject(getUrl(uri), httpEntity, bodyType);
     }
 
     private String getUrl(String uri) {

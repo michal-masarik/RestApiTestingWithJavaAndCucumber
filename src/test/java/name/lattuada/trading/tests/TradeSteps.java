@@ -1,7 +1,6 @@
 package name.lattuada.trading.tests;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
@@ -12,7 +11,6 @@ import name.lattuada.trading.model.dto.SecurityDTO;
 import name.lattuada.trading.model.dto.TradeDTO;
 import name.lattuada.trading.model.dto.UserDTO;
 import org.apache.commons.lang3.RandomStringUtils;
-import org.assertj.core.api.Assertions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.client.HttpClientErrorException;
@@ -21,18 +19,21 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-public class TradeSteps extends RestUtility {
+public class TradeSteps {
 
     private static final Logger logger = LoggerFactory.getLogger(CucumberTest.class);
+    private final RestUtility restUtility;
     private final Map<String, SecurityDTO> securityMap;
     private final Map<String, UserDTO> userMap;
     private OrderDTO buyOrder;
     private OrderDTO sellOrder;
 
     TradeSteps() {
+        restUtility = new RestUtility();
         securityMap = new HashMap<>();
         userMap = new HashMap<>();
     }
@@ -66,7 +67,7 @@ public class TradeSteps extends RestUtility {
     public void aTradeOccursWithThePriceOfAndQuantityOf(Double price, Long quantity) {
         logger.trace("Got price = \"{}\"; quantity = \"{}\"",
                 price, quantity);
-        TradeDTO trade = get("api/trades/orderBuyId/" + buyOrder.getId().toString()
+        TradeDTO trade = restUtility.get("api/trades/orderBuyId/" + buyOrder.getId().toString()
                         + "/orderSellId/" + sellOrder.getId().toString(),
                 TradeDTO.class);
         assertEquals("Price not expected", trade.getPrice(), price);
@@ -75,7 +76,7 @@ public class TradeSteps extends RestUtility {
 
     @Then("no trades occur")
     public void noTradesOccur() {
-        Assertions.assertThatThrownBy(() -> get("api/trades/orderBuyId/" + buyOrder.getId().toString()
+        assertThatThrownBy(() -> restUtility.get("api/trades/orderBuyId/" + buyOrder.getId().toString()
                         + "/orderSellId/" + sellOrder.getId().toString(),
                 TradeDTO.class)).isInstanceOf(HttpClientErrorException.NotFound.class);
     }
@@ -84,8 +85,8 @@ public class TradeSteps extends RestUtility {
         UserDTO userDTO = new UserDTO();
         userDTO.setUsername(userName);
         userDTO.setPassword(RandomStringUtils.randomAlphanumeric(64));
-        UserDTO userReturned = post("api/users",
-                new ObjectMapper().writer().writeValueAsString(userDTO),
+        UserDTO userReturned = restUtility.post("api/users",
+                userDTO,
                 UserDTO.class);
         userMap.put(userName, userReturned);
         logger.info("User created: {}", userReturned);
@@ -94,8 +95,8 @@ public class TradeSteps extends RestUtility {
     private void createSecurity(String securityName) throws JsonProcessingException {
         SecurityDTO securityDTO = new SecurityDTO();
         securityDTO.setName(securityName);
-        SecurityDTO securityReturned = post("api/securities",
-                new ObjectMapper().writer().writeValueAsString(securityDTO),
+        SecurityDTO securityReturned = restUtility.post("api/securities",
+                securityDTO,
                 SecurityDTO.class);
         securityMap.put(securityName, securityReturned);
         logger.info("Security created: {}", securityReturned);
@@ -112,8 +113,8 @@ public class TradeSteps extends RestUtility {
         orderDTO.setType(orderType);
         orderDTO.setPrice(price);
         orderDTO.setQuantity(quantity);
-        OrderDTO orderReturned = post("api/orders",
-                new ObjectMapper().writer().writeValueAsString(orderDTO),
+        OrderDTO orderReturned = restUtility.post("api/orders",
+                orderDTO,
                 OrderDTO.class);
         if (EOrderType.BUY.equals(orderType)) {
             buyOrder = orderReturned;
