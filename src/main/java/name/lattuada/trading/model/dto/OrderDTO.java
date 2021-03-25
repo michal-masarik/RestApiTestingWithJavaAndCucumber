@@ -27,6 +27,7 @@ public class OrderDTO {
     @NotNull
     private EOrderType type;
 
+    @NotNull
     @Positive
     private Double price;
 
