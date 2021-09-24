@@ -94,7 +94,7 @@ public class OrderController {
     public ResponseEntity<OrderDTO> addOrder(@Valid @RequestBody OrderDTO order) {
         try {
             OrderEntity created = orderRepository.save(Mapper.map(order, OrderEntity.class));
-            created = orderRepository.getOne(created.getId());
+            created = orderRepository.getById(created.getId());
             LOGGER.info("Added order: {}", created);
             //
             List<OrderEntity> relatedOrders = orderRepository.findBySecurityIdAndTypeAndFulfilled(created.getSecurityId(),
@@ -115,7 +115,7 @@ public class OrderController {
             if (EOrderType.BUY == created.getType()) {
                 // I created a BUY order and now I found all related SELL order(s)
                 // Find the one with min price
-                OrderEntity related = orderRepository.getOne(relatedOrders.stream()
+                OrderEntity related = orderRepository.getById(relatedOrders.stream()
                         .min(Comparator.comparing(OrderEntity::getPrice))
                         .orElseThrow(NoSuchElementException::new).getId());
                 if (created.getPrice() >= related.getPrice()) {
@@ -124,7 +124,7 @@ public class OrderController {
             } else {
                 // I created a SELL order and now I found all related BUY order(s)
                 // For sake of simplicity, I take the first one
-                OrderEntity related = orderRepository.getOne(relatedOrders.get(0).getId());
+                OrderEntity related = orderRepository.getById(relatedOrders.get(0).getId());
                 if (created.getPrice() <= related.getPrice()) {
                     createTrade(related, created);
                 }

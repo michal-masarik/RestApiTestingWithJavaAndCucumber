@@ -1,4 +1,5 @@
 /.idea/
 /trading.iml
 /target/
+/.jpb/
 **/*.log

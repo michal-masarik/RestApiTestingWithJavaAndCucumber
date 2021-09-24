@@ -6,8 +6,8 @@ Being a first draft, it uses an in-memory H2 database. Neither the schema, nor t
 
 ## Required tools and libraries
 
-1. At least [JDK 11](https://www.oracle.com/java/technologies/javase-downloads.html#JDK11)
-2. [Maven 3.6.3](https://maven.apache.org/download.cgi)
+1. [JDK 17](https://www.oracle.com/java/technologies/downloads/#JDK17)
+2. At least [Maven 3.6.3](https://maven.apache.org/download.cgi)
 
 Install both the JDK (define the environment variable `JAVA_HOME` appropriately), then
 Maven (define the environment variable `M2_HOME` appropriately).
@@ -26,12 +26,12 @@ Note: here tests are skipped, since they are executed later, see the Chapter
 "Test the code".
 
 In this way, a new jar file will be created in the `target` folder, e.g.
-`target/trading-0.0.1-SNAPSHOT.jar`.
+`target/trading-0.0.2-SNAPSHOT.jar`.
 
 ## Run the code
 
 ```shell
-java -jar target/trading-0.0.1-SNAPSHOT.jar
+java -jar target/trading-0.0.2-SNAPSHOT.jar
 ```
 
 ## Test the code
