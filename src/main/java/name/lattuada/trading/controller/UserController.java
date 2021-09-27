@@ -30,8 +30,12 @@ public class UserController {
     private static final Logger LOGGER = LoggerFactory.getLogger(UserController.class);
     private static final String EXCEPTION_CAUGHT = "Exception caught";
 
+    private final IUserRepository userRepository;
+
     @Autowired
-    private IUserRepository userRepository;
+    public UserController(IUserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
 
     @GetMapping()
     @ApiOperation(value = "Get list of users",

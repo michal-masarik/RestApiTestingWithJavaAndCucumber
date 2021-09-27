@@ -27,8 +27,12 @@ public class SecurityController {
     private static final Logger LOGGER = LoggerFactory.getLogger(SecurityController.class);
     private static final String EXCEPTION_CAUGHT = "Exception caught";
 
+    private final ISecurityRepository securityRepository;
+
     @Autowired
-    private ISecurityRepository securityRepository;
+    private SecurityController(ISecurityRepository securityRepository) {
+        this.securityRepository = securityRepository;
+    }
 
     @GetMapping()
     @ApiOperation(value = "Get list of securities",

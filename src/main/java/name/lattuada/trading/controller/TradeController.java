@@ -28,8 +28,12 @@ public class TradeController {
     private static final Logger LOGGER = LoggerFactory.getLogger(TradeController.class);
     private static final String EXCEPTION_CAUGHT = "Exception caught";
 
+    private final ITradeRepository tradeRepository;
+
     @Autowired
-    private ITradeRepository tradeRepository;
+    public TradeController(ITradeRepository tradeRepository) {
+        this.tradeRepository = tradeRepository;
+    }
 
     @GetMapping()
     @ApiOperation(value = "Get list of trades",
