@@ -17,7 +17,7 @@ public class SwaggerConfiguration {
                 .apiInfo(new ApiInfoBuilder()
                         .description("Simple Trading application with REST API and Cucumber tests")
                         .title("Trading application")
-                        .version("0.0.1")
+                        .version("0.0.2")
                         .build())
                 .select()
                 .apis(RequestHandlerSelectors.basePackage("name.lattuada.trading.controller"))
