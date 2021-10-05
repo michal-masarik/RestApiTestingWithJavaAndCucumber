@@ -4,7 +4,6 @@ import org.modelmapper.ModelMapper;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public final class Mapper {
 
@@ -43,7 +42,7 @@ public final class Mapper {
     public static <R, S> List<R> mapAll(final Collection<S> sourceList, final Class<R> resultClass) {
         return sourceList.stream()
                 .map(entity -> map(entity, resultClass))
-                .collect(Collectors.toList());
+                .toList();
     }
 
 }

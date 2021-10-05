@@ -29,11 +29,14 @@ public class OrderController {
     private static final Logger LOGGER = LoggerFactory.getLogger(OrderController.class);
     private static final String EXCEPTION_CAUGHT = "Exception caught";
 
+    private final IOrderRepository orderRepository;
+    private final ITradeRepository tradeRepository;
+
     @Autowired
-    private IOrderRepository orderRepository;
-    @Autowired
-    @Lazy
-    private ITradeRepository tradeRepository;
+    public OrderController(IOrderRepository orderRepository, @Lazy ITradeRepository tradeRepository) {
+        this.orderRepository = orderRepository;
+        this.tradeRepository = tradeRepository;
+    }
 
     @GetMapping()
     @ApiOperation(value = "Get list of orders",
