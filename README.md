@@ -1,8 +1,9 @@
-# Simple Trading Application
+# Testing of simple Trading application
 
-This is a simple trading application.
+This is basic test framework for simple trading application.
+Focus is on testing web service with REST API and other aspects in Java and Cucumber.
 
-Being a first draft, it uses an in-memory H2 database. Neither the schema, nor the data are explicitly created.
+SUT is stand-alone Java Spring Boot application with web REST API. There is model and controller, but no view.
 
 ## Required tools and libraries
 
@@ -12,9 +13,7 @@ Being a first draft, it uses an in-memory H2 database. Neither the schema, nor t
 Install both the JDK (define the environment variable `JAVA_HOME` appropriately), then
 Maven (define the environment variable `M2_HOME` appropriately).
 
-## Build the code
-
-Execute in a shell
+## Build the Trading application
 
 ```shell
 git clone https://github.com/maurizio-lattuada/trading.git
@@ -22,41 +21,49 @@ cd trading
 mvn -U clean verify -DskipTests
 ```
 
-Note: here tests are skipped, since they are executed later, see the Chapter
-"Test the code".
-
 In this way, a new jar file will be created in the `target` folder, e.g.
 `target/trading-0.0.2-SNAPSHOT.jar`.
 
-## Run the code
+## Run the Trading application
 
 ```shell
 java -jar target/trading-0.0.2-SNAPSHOT.jar
 ```
 
-## Test the code
+## Run the tests
 
-Once you launched the main application (see the previous Chapter), you can test it as
+Once trading application is running, you can run all tests by
 
 ```shell
 mvn test
 ```
 
-Note that here the whole application has been structured to have it first running
-(see the previous Chapter), then tested via Cucumber. In this way, you can eventually verify manually the database
-content.
+By this you will get cucumber styled test report with all logging just in your console.
 
-Optionally, you can remove the comment to annotation `@SpringBootTest` in file
-[`CucumberTest.java`](src/test/java/name/lattuada/trading/tests/CucumberTest.java), so you can run the test without
-explicitly having the application running.
+## Test Reports
 
-In this way, by invoking:
+once tests are run, in console you can also find a link to online published test report eg.:
 
-```shell
-mvn -U clean verify
+```
+View your Cucumber Report at:                                            
+https://reports.cucumber.io/reports/4fd167d8-1217-48c5-9eb6-b4100e0bfdbc          
 ```
 
-you can build and test directly the code.
+Alternatively if you don't want to build app and run tests yourself, but you want just see my test results, then you can visit [Trading Test Reports](https://reports.cucumber.io/report-collections/e17c7f4f-e651-4d51-bb82-a8d9cfac14da)
+
+## My solution
+
+I implemented very basic framework with JAVA and Cucumber for testing REST API of trading application in best way I was able to do with my current knowledge.
+I won't be explaining much here, because architecture is simple and it's already explained in javadoc comments in code. We can discuss it later as well.
+
+I implemented few tests just to demonstrate possibility of framework. I can imagine, that many other tests can be implemented and some other bugs in trading application can be possibly found. But I focused more on quality of solution then quantity.
+
+During my test implementation I was able to find some bug in application logic namely in Trade Controller. You can see failing test.
+
+I also created one example test for functionality, which is not yet implemented. So obviously this test is failing now as well.
+
+Happy reviewing.
+
 
 ## Verify database content
 
