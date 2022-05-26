@@ -4,6 +4,7 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.web.client.RestTemplate;
+import name.lattuada.trading.tests.ConfigReader;
 
 /**
  * This Utility class provides basic REST API support for {@link ApiFacade}
@@ -16,7 +17,7 @@ public final class RestUtility {
 	private final RestTemplate restTemplate;
 
 	public RestUtility() {
-		this.baseUrl = "http://localhost:8080";
+		this.baseUrl = ConfigReader.getInstance().getProperty("baseUrl");
 		headers = new HttpHeaders();
 		headers.setContentType(MediaType.APPLICATION_JSON);
 		restTemplate = new RestTemplate();
