@@ -1,4 +1,3 @@
-
 Feature: Trades
 	Tests in this feature group are designed to test trade-controller.   
   Feature is testing services available via a REST API on /api/trades endpoint.
@@ -69,6 +68,4 @@ Feature: Trades
     And user "toast_buyer" is created
     When user "toast_seller" puts a "sell" order for security "toast" with a price of 10 and quantity of 99
    	And user "toast_buyer" puts a "buy" order for security "toast" with a price of 10 and a quantity of 100
-   	Then a trade occurs between "toast_buyer" and "toast_seller" with the price of 10 and quantity of 99
-    	
-  
+   	Then a trade occurs between "toast_buyer" and "toast_seller" with the price of 10 and quantity of 99  

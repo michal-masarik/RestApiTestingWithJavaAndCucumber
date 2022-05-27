@@ -40,5 +40,3 @@ Feature: Orders
     And security "EUR" is created
     When user "James" puts a "buy" order for security "EUR" with a price of 25 and quantity of 1000
     Then only 1 order was added
-    
-

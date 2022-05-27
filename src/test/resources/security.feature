@@ -1,4 +1,3 @@
-
 @tag
 Feature: Securities
   Tests in this feature group are designed to test security-controller in isolation. 
@@ -24,5 +23,4 @@ Feature: Securities
     When security "Crude Oil" is created
     And security "Cotton" is created
     Then only 2 security was added
-    
-    
+        

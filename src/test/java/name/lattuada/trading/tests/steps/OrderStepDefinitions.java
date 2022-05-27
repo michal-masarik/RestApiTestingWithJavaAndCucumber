@@ -42,7 +42,6 @@ public class OrderStepDefinitions implements IStepDefinitions {
 		OrderDTO expectedOrder;
 		if (orderType.equalsIgnoreCase(EOrderType.BUY.toString())) {
 			expectedOrder = context.buyOrder;
-			System.out.println("context.buyOrder"+context.buyOrder);
 		} else {
 			expectedOrder = context.sellOrder;
 		}

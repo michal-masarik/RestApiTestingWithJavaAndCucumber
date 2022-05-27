@@ -1,4 +1,3 @@
-
 @tag
 Feature: Not implemented functionality yet.
 Tests in this feature group are now expected to be failing.
@@ -17,4 +16,3 @@ Lets assume that we want implement this core functionality in next iteration, so
    	And user "merchant" puts a "buy" order for security "Cucumber" with a price of 12 and a quantity of 120
    	Then a trade occurs between "merchant" and "first_farmer" with the price of 10 and quantity of 100
    	And a trade occurs between "merchant" and "second_farmer" with the price of 11 and quantity of 20
-

@@ -53,16 +53,23 @@ Alternatively if you don't want to build app and run tests yourself, but you wan
 
 ## My solution
 
+Firstly I did some reverse engineering of trading application. Then I was studying topics related to my task (Spring Boot applications, Cucumber, API testing etc.).
+
 I implemented very basic framework with JAVA and Cucumber for testing REST API of trading application in best way I was able to do with my current knowledge.
-I won't be explaining much here, because architecture is simple and it's already explained in javadoc comments in code. We can discuss it later as well.
+Architecture is simple and it's explained in javadoc comments in code.
 
-I implemented few tests just to demonstrate possibility of framework. I can imagine, that many other tests can be implemented and some other bugs in trading application can be possibly found. But I focused more on quality of solution then quantity.
+I implemented few tests to demonstrate possibility of framework. Other tests can be implemented and some other bugs in trading application can be possibly found, but I focused more on quality of my solution then quantity of tests.
 
-During my test implementation I was able to find some bug in application logic namely in Trade Controller. You can see failing test.
+During my test implementation I was also able to find some bug in application logic namely in Trade Controller. You can see failing test.
 
-I also created one example test for functionality, which is not yet implemented. So obviously this test is failing now as well.
+Based on BDD principles I also created example test for functionality, which is not yet implemented. So obviously this test is failing now as well.
 
-Happy reviewing.
+I implemented basic functionality enabling test parameters (e.g. base URL) to be read from a configuration file, as was suggested in potentional improvements.
+
+I did some investigation in direction what would need to be done in terms of better constraints and foreign keys in application repository. In my opinion SUT would need redesign the way how IDs of elements are used. After analysing, that lot of changes would need to be done in SUT, I decided not to implement this, as changing SUT implementation is not fully related to my testing task.
+
+I also implemented few Spring Boot junit tests for UserController.class just for demonstration purposes. I used RestAssured library for this. Please notice, that these junit tests results aren't propagated to Cucumber web report. Tests results are in console, when run locally.
+
 
 
 ## Verify database content

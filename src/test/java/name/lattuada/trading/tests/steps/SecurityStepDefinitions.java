@@ -77,5 +77,4 @@ public class SecurityStepDefinitions implements IStepDefinitions {
 		List<SecurityDTO> securityList = api.getAllSecurities();
 		return securityList.size();
 	}
-
 }
