@@ -40,7 +40,7 @@ public class OrderStepDefinitions implements IStepDefinitions {
 	public void order_from_user_for_security_with_a_price_of_and_quantity_of_exists(String orderType, String userName,
 			String securityName, Double price, Long quantity) {
 		OrderDTO expectedOrder;
-		if (orderType.equalsIgnoreCase(EOrderType.BUY.toString())) {
+		if (orderType == (EOrderType.BUY.toString())) {
 			expectedOrder = context.buyOrder;
 		} else {
 			expectedOrder = context.sellOrder;
@@ -77,7 +77,7 @@ public class OrderStepDefinitions implements IStepDefinitions {
 		orderDTO.setPrice(price);
 		orderDTO.setQuantity(quantity);
 		OrderDTO orderReturned = api.createOrder(orderDTO);
-		if (EOrderType.BUY.equals(orderType)) {
+		if (EOrderType.BUY == (orderType)) {
 			context.buyOrder = orderReturned;
 			logger.trace("put in context - buyOrder:" + context.buyOrder);
 		} else {

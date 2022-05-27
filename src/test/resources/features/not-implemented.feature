@@ -1,4 +1,4 @@
-@tag
+@not-implemented-feature
 Feature: Not implemented functionality yet.
 Tests in this feature group are now expected to be failing.
 This is because in Behavior driven development (BDD) we often want to implement 
@@ -6,6 +6,7 @@ tests before we start implementing feature, similarly like in Test Driven Develo
 
 Lets assume that we want implement this core functionality in next iteration, so let's write a test already now.
 
+  @functional
   Scenario: Single buy order can be satisfied by creating multiple trades based on minimum price.
   	Given one security "Cucumber" is created
   	And user "first_farmer" is created
