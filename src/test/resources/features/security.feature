@@ -1,4 +1,4 @@
-@Securities-api
+@Securities-api-tests
 Feature: Securities
   Tests in this feature group are designed to test security-controller in isolation. 
   Feature is testing services available via a REST API on /api/securities endpoint.
@@ -23,4 +23,33 @@ Feature: Securities
     When security "Crude Oil" is created
     And security "Cotton" is created
     Then only 2 security was added
+    
+  @response-code     
+	Scenario: Asking for a non-existing security responds with code 404 Not found
+		Given a random non-existing security
+		When we ask for the random security via the "/api/securities"
+		Then server responds with code 404
+		
+	@response-code  	
+	Scenario: Creating security successfully responds with code 201 and 
+	security is returned in body of response
+		When we create new security via the "/api/securities" succesfully
+		Then server responds with code 201 
+		And security is returned in body of response
+		
+	@response-code      
+	Scenario: Attempt to create security without name responds with code 400 Bad request
+		When we create security via the "/api/securities" without name
+		Then server responds with code 400
+		
+	@performance     
+	Scenario: creating a new security does not take too much time
+		When we create new security via the "/api/securities" succesfully
+		Then server responds in 3000 miliseconds
+		
+	@performance     
+	Scenario: getting security does not take too much time
+		Given a random non-existing security
+		When we ask for the random security via the "/api/securities"
+		Then server responds in 3000 miliseconds
         

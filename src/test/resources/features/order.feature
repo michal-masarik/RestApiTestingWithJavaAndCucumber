@@ -1,4 +1,4 @@
-@orders-api
+@orders-api-tests
 Feature: Orders
   Tests in this feature group are designed to test order-controller.
   Feature is testing services available via a REST API on /api/orders endpoint.
@@ -40,4 +40,35 @@ Feature: Orders
     And security "EUR" is created
     When user "James" puts a "buy" order for security "EUR" with a price of 25 and quantity of 1000
     Then only 1 order was added
+    
+  @response-code     
+	Scenario: Asking for a non-existing order responds with code 404 Not found
+		Given a random non-existing order
+		When we ask for the random order via the "/api/orders"
+		Then server responds with code 404
+		
+	@response-code  	
+	Scenario: Creating order successfully responds with code 201 and order is returned in body of response
+		Given random user and a random security
+		When we create new order via the "/api/orders" succesfully
+		Then server responds with code 201 
+		And order is returned in body of response
+		
+	@response-code      
+	Scenario: Attempt to create invalid order responds with code 400 Bad request
+		Given random user and a random security
+		When we create invalid order via the "/api/orders" without quantity and price 
+		Then server responds with code 400
+		
+	@performance     
+	Scenario: creating a new order does not take too much time
+		Given random user and a random security
+		When we create new order via the "/api/orders" succesfully
+		Then server responds in 3000 miliseconds
+		
+	@performance     
+	Scenario: getting order does not take too much time
+		Given a random non-existing order
+		When we ask for the random order via the "/api/orders"
+		Then server responds in 3000 miliseconds  
     

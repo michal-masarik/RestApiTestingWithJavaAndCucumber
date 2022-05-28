@@ -17,3 +17,10 @@ Lets assume that we want implement this core functionality in next iteration, so
    	And user "merchant" puts a "buy" order for security "Cucumber" with a price of 12 and a quantity of 120
    	Then a trade occurs between "merchant" and "first_farmer" with the price of 10 and quantity of 100
    	And a trade occurs between "merchant" and "second_farmer" with the price of 11 and quantity of 20
+
+	@functional     
+	Scenario: Better constraints should be implemented to avoid creating order with not-existing user and security.
+		Given random user and a random security
+		When we create new order via the "/api/orders"
+		Then server responds with code 400
+		

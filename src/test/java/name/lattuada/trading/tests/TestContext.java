@@ -3,6 +3,7 @@ package name.lattuada.trading.tests;
 import java.util.HashMap;
 import java.util.Map;
 
+import io.restassured.response.Response;
 import name.lattuada.trading.model.dto.OrderDTO;
 import name.lattuada.trading.model.dto.SecurityDTO;
 import name.lattuada.trading.model.dto.UserDTO;
@@ -40,6 +41,7 @@ public class TestContext {
 	public final Map<String, SecurityDTO> orderMap;
 	public OrderDTO buyOrder;
 	public OrderDTO sellOrder;
+	public Response response;
 
 	private TestContext() {
 		securityMap = new HashMap<>();
@@ -47,6 +49,7 @@ public class TestContext {
 		orderMap = new HashMap<>();
 		buyOrder = new OrderDTO();
 		sellOrder = new OrderDTO();
+		response = null;
 	}
 
 	public static TestContext getInstance() {
@@ -62,5 +65,6 @@ public class TestContext {
 		orderMap.clear();
 		buyOrder = null;
 		sellOrder = null;
+		response = null;
 	}
 }

@@ -1,3 +1,4 @@
+@Tradea-api-tests
 Feature: Trades
 	Tests in this feature group are designed to test trade-controller.   
   Feature is testing services available via a REST API on /api/trades endpoint.
@@ -6,6 +7,7 @@ Feature: Trades
 	while trade-controller comes into play in last verification steps). 
 	Therefore these tests are not testing trade-controller in isolation from other services.
 
+	@functional 
   Scenario: Basic trading Buy Sell
     Given one security "WSB" is created
     And user "Diamond" is created
@@ -13,7 +15,8 @@ Feature: Trades
     When user "Diamond" puts a "buy" order for security "WSB" with a price of 101 and quantity of 50
     And user "Paper" puts a "sell" order for security "WSB" with a price of 100 and a quantity of 100
     Then a trade occurs with the price of 100 and quantity of 50
-
+	
+	@functional
   Scenario: Basic trading Sell Buy
   	Given one security "SEC" is created
     And user "User1" is created
@@ -22,6 +25,7 @@ Feature: Trades
     And user "User1" puts a "buy" order for security "SEC" with a price of 101 and quantity of 50
     Then a trade occurs with the price of 100 and quantity of 50
 
+	@functional
   Scenario: No trades occur
   	Given one security "NTR" is created
     And user "User1" is created
@@ -29,7 +33,8 @@ Feature: Trades
     When user "User2" puts a "sell" order for security "NTR" with a price of 100 and a quantity of 100
     And user "User1" puts a "buy" order for security "NTR" with a price of 99 and quantity of 50
     Then no trades occur
-    
+ 
+ 	@functional   
   Scenario: Trade occurs with minimum sell price possible.
   	Given one security "BTC" is created
   	And user "buyer" is created
@@ -39,7 +44,8 @@ Feature: Trades
    	And user "expensiveSeller" puts a "sell" order for security "BTC" with a price of 104 and quantity of 150
    	And user "buyer" puts a "buy" order for security "BTC" with a price of 105 and a quantity of 100
    	Then a trade occurs between "buyer" and "cheapSeller"
-   	
+ 
+ 	@functional  	
   Scenario: Trade occurs with minimum sell price possible. Even when expensive sell order was created firstly.
   	Given one security "ETH" is created
   	And user "buyer" is created
@@ -49,7 +55,8 @@ Feature: Trades
     And user "cheapSeller" puts a "sell" order for security "ETH" with a price of 13 and quantity of 150
    	And user "buyer" puts a "buy" order for security "ETH" with a price of 15 and a quantity of 100
    	Then a trade occurs between "buyer" and "cheapSeller"
-   	
+   
+  @functional	
   Scenario: In case sell order is created first, then first relevant buy order is used to create trade.
   	Given one security "ETH" is created
   	And user "seller" is created
@@ -61,7 +68,8 @@ Feature: Trades
    	And user "buyer2" puts a "buy" order for security "ETH" with a price of 11 and a quantity of 100
    	And user "buyer3" puts a "buy" order for security "ETH" with a price of 12 and a quantity of 100
    	Then a trade occurs between "buyer2" and "seller"
-   	
+
+	@functional   	
   Scenario: Buy order has bigger quantity then sell order.
   	Given one security "toast" is created
   	And user "toast_seller" is created
