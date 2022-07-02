@@ -1,8 +1,33 @@
-# Simple Trading Application
+# REST API Testing with Java, REST Assured and Cucumber
 
-This is a simple trading application.
+This is a proof of concept of test framework for simple trading application.
+Focus is on testing web services with REST API and other aspects in Java, REST Assured and Cucumber.
 
-Being a first draft, it uses an in-memory H2 database. Neither the schema, nor the data are explicitly created.
+SUT is stand-alone Java Spring Boot application with web REST API. There is model and controller, but no view. SUT has dedicated DTO and Entity layers. 
+H2 in-memory database is used for storing data and managed by Hibernate JPA framework.
+
+## Motivation
+
+I got task to implement REST API testing framework for existing trivial trading application during application process for role of Test Automation Engineer in a Swiss Exchange company. 
+
+## My solution
+
+I implemented very basic framework with JAVA, REST Assured and Cucumber for testing REST APIs of trading application in best way I was able to do with my current knowledge of used technology.
+
+Architecture is simple and it's explained in javadoc documentation in code.
+
+I implemented medium amount of tests to demonstrate possibility of framework. More tests can always be implemented and some other bugs in trading application can be possibly found, but I haven't focused on quantity of tests.
+
+During my test implementation I was also able to find some bug in application logic namely in Trade Controller. There are therefore failing tests.
+
+I analyzed existing business logic in SUT and based on BDD principles I also created example test for functionality, which is not yet implemented. These tests are obviously failing now as well.
+
+I implemented basic functionality enabling test parameters (e.g. base URL) to be read from a configuration file, as was suggested as potential bonus point for solution.
+
+I did some investigation in direction what would need to be done in terms of better constraints and foreign keys in application repository. In my opinion SUT would need redesign the way how IDs of entities are used. After analysing, that quite lot of changes would need to be done in SUT, I decided not to implement this, as changing SUT implementation is not fully related to my testing task.
+
+I also implemented few Spring Boot jUnit tests for UserController.class just for demonstration purposes. I used RestAssured library for this. Please notice, that these jUnit tests results aren't propagated to Cucumber web report. Tests results are just shown in console, when run locally.
+
 
 ## Required tools and libraries
 
@@ -12,51 +37,42 @@ Being a first draft, it uses an in-memory H2 database. Neither the schema, nor t
 Install both the JDK (define the environment variable `JAVA_HOME` appropriately), then
 Maven (define the environment variable `M2_HOME` appropriately).
 
-## Build the code
-
-Execute in a shell
+## Build the Trading application
 
 ```shell
-git clone https://github.com/maurizio-lattuada/trading.git
 cd trading
 mvn -U clean verify -DskipTests
 ```
 
-Note: here tests are skipped, since they are executed later, see the Chapter
-"Test the code".
-
 In this way, a new jar file will be created in the `target` folder, e.g.
 `target/trading-0.0.2-SNAPSHOT.jar`.
 
-## Run the code
+## Run the Trading application
 
 ```shell
 java -jar target/trading-0.0.2-SNAPSHOT.jar
 ```
 
-## Test the code
+## Run the tests
 
-Once you launched the main application (see the previous Chapter), you can test it as
+Once trading application is running, you can run all tests by
 
 ```shell
 mvn test
 ```
 
-Note that here the whole application has been structured to have it first running
-(see the previous Chapter), then tested via Cucumber. In this way, you can eventually verify manually the database
-content.
+By this you will get cucumber styled test report with all logging just in your console.
 
-Optionally, you can remove the comment to annotation `@SpringBootTest` in file
-[`CucumberTest.java`](src/test/java/name/lattuada/trading/tests/CucumberTest.java), so you can run the test without
-explicitly having the application running.
+## Test Reports
 
-In this way, by invoking:
+After test run, in console you can find a link to online test report eg.:
 
-```shell
-mvn -U clean verify
+```
+View your Cucumber Report at:                                            
+https://reports.cucumber.io/reports/71d5018b-d043-4aad-bf26-ae254bbb63e1         
 ```
 
-you can build and test directly the code.
+Alternatively (if you don't want to build app and run tests yourself) you can check my last [Trading Test Reports](https://reports.cucumber.io/report-collections/e17c7f4f-e651-4d51-bb82-a8d9cfac14da)
 
 ## Verify database content
 
@@ -81,9 +97,9 @@ in [`application.properties`](src/main/resources/application.properties)):
 Once the application is started, you can check all the available APIs and models by using
 the [Swagger interface](http://localhost:8080/swagger-ui/).
 
-## Improvements
+## Improvements for SUT application
 
-1. Unit tests!!!
+1. Unit tests
 2. Foreign keys and eventually better constraints on DB schema, so we avoid adding corrupted data in the database (e.g.
    orders related to not existing users/securities...)
 3. Introduce test parameters (e.g. base URL) to be read from a configuration file
