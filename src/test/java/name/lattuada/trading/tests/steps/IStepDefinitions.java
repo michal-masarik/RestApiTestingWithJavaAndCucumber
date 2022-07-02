@@ -32,10 +32,10 @@ public interface IStepDefinitions {
 	
 	@Before
 	private void cleanTestContext(){
-		context.clean();	
+		CONTEXT.clean();	
 	}
 
-	static final ApiFacade api = new ApiFacade();
-	static final TestContext context = TestContext.getInstance();
-	static final Logger logger = LoggerFactory.getLogger(CucumberTest.class);
+	static final ApiFacade API = new ApiFacade();
+	static final TestContext CONTEXT = TestContext.getInstance();
+	static final Logger LOGGER = LoggerFactory.getLogger(CucumberTest.class);
 }

@@ -22,6 +22,16 @@ import name.lattuada.trading.TradingApplication;
 import name.lattuada.trading.model.dto.UserDTO;
 import name.lattuada.trading.repository.IUserRepository;
 
+/**
+ * 
+ * This class is example of unit tests for user controller, 
+ * running within context of the Spring Boot application.
+ * 
+ * This is not comprehensive test solution, but rather just demonstration of technology usage.
+ * 
+ * @author michal masarik
+ *
+ */
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = {TradingApplication.class})
 public class UserControllerTest {

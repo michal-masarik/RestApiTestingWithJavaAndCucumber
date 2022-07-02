@@ -9,6 +9,8 @@ import name.lattuada.trading.tests.ConfigReader;
 /**
  * This Utility class provides basic REST API support for {@link ApiFacade}
  * 
+ * @author michal masarik
+ * 
  */
 public final class RestUtility {
 
@@ -24,14 +26,14 @@ public final class RestUtility {
 	}
 
 	/**
-	 * this method provides GET request for REST API
+	 * Provides GET request for REST API
 	 */
 	public <T> T get(String uri, Class<T> valueType) {
 		return restTemplate.getForObject(getUrl(uri), valueType);
 	}
 
 	/**
-	 * this method provides POST request for REST API
+	 * Provides POST request for REST API
 	 */
 	public <T, B> T post(String uri, B body, Class<T> bodyType) {
 		HttpEntity<B> httpEntity = new HttpEntity<>(body, headers);

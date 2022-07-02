@@ -1,30 +1,32 @@
-# Testing of simple Trading application
+# REST API Testing with Java, REST Assured and Cucumber
 
-This is basic test framework for simple trading application.
-Focus is on testing web service with REST API and other aspects in Java and Cucumber.
+This is a proof of concept of test framework for simple trading application.
+Focus is on testing web services with REST API and other aspects in Java, REST Assured and Cucumber.
 
-SUT is stand-alone Java Spring Boot application with web REST API. There is model and controller, but no view.
+SUT is stand-alone Java Spring Boot application with web REST API. There is model and controller, but no view. SUT has dedicated DTO and Entity layers. 
+H2 in-memory database is used for storing data and managed by Hibernate JPA framework.
+
+## Motivation
+
+I got task to implement REST API testing framework for existing trivial trading application during application process for role of Test Automation Engineer in a Swiss Exchange company. 
 
 ## My solution
 
-Firstly I did some reverse engineering of trading application. Then I was studying topics related to my task (Spring Boot applications, Cucumber, API testing etc.).
+I implemented very basic framework with JAVA, REST Assured and Cucumber for testing REST APIs of trading application in best way I was able to do with my current knowledge of used technology.
 
-I implemented very basic framework with JAVA and Cucumber for testing REST APIs of trading application in best way I was able to do with my current knowledge of used technology.
-Architecture is simple and it's explained in javadoc comments in code.
+Architecture is simple and it's explained in javadoc documentation in code.
 
-Later when experimenting with REST API testing, I found useful framework [REST-assured](http://rest-assured.io/). It was so helpful to minimize some java code, that I decided to introduce it into my project as well.
+I implemented medium amount of tests to demonstrate possibility of framework. More tests can always be implemented and some other bugs in trading application can be possibly found, but I haven't focused on quantity of tests.
 
-I implemented few tests to demonstrate possibility of framework. More tests can always be implemented and some other bugs in trading application can be possibly found, but I haven't focused on quantity of tests.
+During my test implementation I was also able to find some bug in application logic namely in Trade Controller. There are therefore failing tests.
 
-During my test implementation I was also able to find some bug in application logic namely in Trade Controller. You can see failing test there.
+I analyzed existing business logic in SUT and based on BDD principles I also created example test for functionality, which is not yet implemented. These tests are obviously failing now as well.
 
-I analyzed existing business logic in SUT and based on BDD principles I also created example test for functionality, which is not yet implemented. So obviously this test is failing now as well.
-
-I implemented basic functionality enabling test parameters (e.g. base URL) to be read from a configuration file, as was suggested in potentional improvements.
+I implemented basic functionality enabling test parameters (e.g. base URL) to be read from a configuration file, as was suggested as potential bonus point for solution.
 
 I did some investigation in direction what would need to be done in terms of better constraints and foreign keys in application repository. In my opinion SUT would need redesign the way how IDs of entities are used. After analysing, that quite lot of changes would need to be done in SUT, I decided not to implement this, as changing SUT implementation is not fully related to my testing task.
 
-I also implemented few Spring Boot junit tests for UserController.class just for demonstration purposes. I used RestAssured library for this. Please notice, that these junit tests results aren't propagated to Cucumber web report. Tests results are in console, when run locally.
+I also implemented few Spring Boot jUnit tests for UserController.class just for demonstration purposes. I used RestAssured library for this. Please notice, that these jUnit tests results aren't propagated to Cucumber web report. Tests results are just shown in console, when run locally.
 
 
 ## Required tools and libraries
@@ -38,7 +40,6 @@ Maven (define the environment variable `M2_HOME` appropriately).
 ## Build the Trading application
 
 ```shell
-git clone https://github.com/maurizio-lattuada/trading.git
 cd trading
 mvn -U clean verify -DskipTests
 ```
@@ -73,9 +74,6 @@ https://reports.cucumber.io/reports/71d5018b-d043-4aad-bf26-ae254bbb63e1
 
 Alternatively (if you don't want to build app and run tests yourself) you can check my last [Trading Test Reports](https://reports.cucumber.io/report-collections/e17c7f4f-e651-4d51-bb82-a8d9cfac14da)
 
-
-
-
 ## Verify database content
 
 When the application is running, you can check the database content with a
@@ -99,9 +97,9 @@ in [`application.properties`](src/main/resources/application.properties)):
 Once the application is started, you can check all the available APIs and models by using
 the [Swagger interface](http://localhost:8080/swagger-ui/).
 
-## Improvements
+## Improvements for SUT application
 
-1. Unit tests!!!
+1. Unit tests
 2. Foreign keys and eventually better constraints on DB schema, so we avoid adding corrupted data in the database (e.g.
    orders related to not existing users/securities...)
 3. Introduce test parameters (e.g. base URL) to be read from a configuration file

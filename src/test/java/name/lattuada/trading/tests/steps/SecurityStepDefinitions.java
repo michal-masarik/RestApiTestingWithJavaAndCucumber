@@ -35,71 +35,71 @@ public class SecurityStepDefinitions implements IStepDefinitions {
 
 	@When("security {string} is created")
 	@Given("one security {string} is created")
-	public void one_security_is_created(String securityName) {
+	public void createNewSecurity(String securityName) {
 		SecurityDTO securityDTO = new SecurityDTO();
 		securityDTO.setName(securityName);
-		SecurityDTO returnedSecurity = api.createSecurity(securityDTO);
-		context.securityMap.put(securityName, returnedSecurity);
+		SecurityDTO returnedSecurity = API.createSecurity(securityDTO);
+		CONTEXT.securityMap.put(securityName, returnedSecurity);
 	}
 
 	@Given("known number of securities")
-	public void known_number_of_securities() {
+	public void getNumberOfSecurities() {
 		numberOfSecurities = getNumberOfExistingSecurities();
 	}
 
 	@Then("only {int} security was added")
-	public void only_security_was_added(Integer numberOfAddedSecurities) {
+	public void verifyNumberOfNewSecurities(Integer numberOfAddedSecurities) {
 		int updatedNumberOfSecurities = getNumberOfExistingSecurities();
 		assertEquals("Unexpected number of securities", numberOfSecurities + numberOfAddedSecurities,
 				updatedNumberOfSecurities);
 	}
 
 	@Then("security {string} exists")
-	public void security_exists(String securityName) {
-		logger.trace("securityName = \"{}\"", securityName);
+	public void verifyThatSecurityExists(String securityName) {
+		LOGGER.trace("securityName = \"{}\"", securityName);
 		SecurityDTO security = getSecurity(securityName);
 		assertEquals(securityName, security.getName());
 	}
 
 	@Then("both securities {string} and {string} exist")
-	public void both_securities_and_exist(String firstSecurityname, String secondSecurityname) {
-		logger.trace("firstSecurityname = \"{}\"; secondSecurityname = \"{}\"", firstSecurityname, secondSecurityname);
-		List<SecurityDTO> securityList = api.getAllSecurities();
-		assertSecurityNotInList(firstSecurityname, securityList);
-		assertSecurityNotInList(secondSecurityname, securityList);
+	public void verifyThatBothSecuritiesExist(String firstSecurityname, String secondSecurityname) {
+		LOGGER.trace("firstSecurityname = \"{}\"; secondSecurityname = \"{}\"", firstSecurityname, secondSecurityname);
+		List<SecurityDTO> securityList = API.getAllSecurities();
+		assertSecurityIsInList(firstSecurityname, securityList);
+		assertSecurityIsInList(secondSecurityname, securityList);
 	}
 
 	@Given("a random non-existing security")
-	public void a_random_non_existing_security() {
+	public void createOneRandomSecurity() {
 		randomSecurity = new SecurityDTO();
 		randomSecurity.setId(UUID.randomUUID());
 		randomSecurity.setName(RandomStringUtils.randomAlphabetic(5));
 	}
 
 	@When("we ask for the random security via the {string}")
-	public void we_ask_for_the_random_security_via_the(String location) {
-		context.response = RestAssured.get(location + "/" + randomSecurity.getId());
+	public void returnRandomSecurity(String location) {
+		CONTEXT.response = RestAssured.get(location + "/" + randomSecurity.getId());
 	}
 
 	@When("we create new security via the {string} succesfully")
-	public void we_create_new_security_via_the_succesfully(String location) {
+	public void createNewSecuritySuccessfully(String location) {
 		SecurityDTO security = new SecurityDTO();
 		security.setName(RandomStringUtils.randomAlphabetic(5));
 		securityName = security.getName();
-		context.response = given().contentType(ContentType.JSON).body(security).post(location);
+		CONTEXT.response = given().contentType(ContentType.JSON).body(security).post(location);
 	}
 
 	@Then("security is returned in body of response")
-	public void security_is_returned_in_body_of_response() {
-		context.response.then().body("name", equalTo(securityName));
+	public void verifySecurityIsReturnedInResponseBody() {
+		CONTEXT.response.then().body("name", equalTo(securityName));
 	}
 
 	@When("we create security via the {string} without name")
-	public void we_create_security_via_the_without_name(String location) {
+	public void createSecurityWithoutName(String location) {
 		SecurityDTO security = new SecurityDTO();
-		context.response = given().contentType(ContentType.JSON).body(security).post(location);
+		CONTEXT.response = given().contentType(ContentType.JSON).body(security).post(location);
 	}
-	
+
 	public static SecurityDTO createRandomSecurity() {
 		SecurityDTO security = new SecurityDTO();
 		security.setId(UUID.randomUUID());
@@ -107,8 +107,8 @@ public class SecurityStepDefinitions implements IStepDefinitions {
 		return security;
 	}
 
-	private void assertSecurityNotInList(String securityname, List<SecurityDTO> securityList) {
-		UUID securityExpectedId = context.securityMap.get(securityname).getId();
+	private void assertSecurityIsInList(String securityname, List<SecurityDTO> securityList) {
+		UUID securityExpectedId = CONTEXT.securityMap.get(securityname).getId();
 		SecurityDTO security = securityList.stream().filter(s -> securityExpectedId.equals(s.getId())).findAny()
 				.orElse(null);
 		assertNotNull("Security " + securityname + " doesn't exist", security);
@@ -116,13 +116,13 @@ public class SecurityStepDefinitions implements IStepDefinitions {
 
 	private SecurityDTO getSecurity(String securityName) {
 		assertTrue(String.format("Unknown security \"%s\"", securityName),
-				context.securityMap.containsKey(securityName));
-		UUID securityId = context.securityMap.get(securityName).getId();
-		return api.getSecurity(securityId);
+				CONTEXT.securityMap.containsKey(securityName));
+		UUID securityId = CONTEXT.securityMap.get(securityName).getId();
+		return API.getSecurity(securityId);
 	}
 
 	private int getNumberOfExistingSecurities() {
-		List<SecurityDTO> securityList = api.getAllSecurities();
+		List<SecurityDTO> securityList = API.getAllSecurities();
 		return securityList.size();
 	}
 }

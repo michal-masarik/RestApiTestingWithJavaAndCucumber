@@ -22,8 +22,8 @@ import name.lattuada.trading.tests.CucumberTest;
  */
 public class ApiFacade {
 
-	private final RestUtility restUtility = new RestUtility();
-	private static final Logger logger = LoggerFactory.getLogger(CucumberTest.class);
+	private static final RestUtility REST_UTILITY = new RestUtility();
+	private static final Logger LOGGER = LoggerFactory.getLogger(CucumberTest.class);
 
 	/**
 	 * method returns list of all users stored on server
@@ -31,7 +31,7 @@ public class ApiFacade {
 	 */
 	public List<UserDTO> getAllUsers() {
 		ObjectMapper mapper = new ObjectMapper();
-		List<UserDTO> userList = mapper.convertValue(restUtility.get("api/users/", List.class),
+		List<UserDTO> userList = mapper.convertValue(REST_UTILITY.get("api/users/", List.class),
 				new TypeReference<List<UserDTO>>() {
 				});
 		return userList;
@@ -43,8 +43,8 @@ public class ApiFacade {
 	 * @return created user
 	 */
 	public UserDTO createUser(UserDTO user) {
-		UserDTO returnedUser = restUtility.post("api/users", user, UserDTO.class);
-		logger.info("User created: {}", returnedUser);
+		UserDTO returnedUser = REST_UTILITY.post("api/users", user, UserDTO.class);
+		LOGGER.info("User created: {}", returnedUser);
 		return returnedUser;
 	}
 
@@ -54,7 +54,7 @@ public class ApiFacade {
 	 * @return user
 	 */
 	public UserDTO getUser(UUID uuid) {
-		UserDTO returnedUser = restUtility.get("api/users/" + uuid.toString(), UserDTO.class);
+		UserDTO returnedUser = REST_UTILITY.get("api/users/" + uuid.toString(), UserDTO.class);
 		return returnedUser;
 	}
 
@@ -64,7 +64,7 @@ public class ApiFacade {
 	 */
 	public List<SecurityDTO> getAllSecurities() {
 		ObjectMapper mapper = new ObjectMapper();
-		List<SecurityDTO> securityList = mapper.convertValue(restUtility.get("api/securities/", List.class),
+		List<SecurityDTO> securityList = mapper.convertValue(REST_UTILITY.get("api/securities/", List.class),
 				new TypeReference<List<SecurityDTO>>() {
 				});
 		return securityList;
@@ -76,8 +76,8 @@ public class ApiFacade {
 	 * @return created security
 	 */
 	public SecurityDTO createSecurity(SecurityDTO security) {
-		SecurityDTO returnedSecurity = restUtility.post("api/securities", security, SecurityDTO.class);
-		logger.info("Security created: {}", returnedSecurity);
+		SecurityDTO returnedSecurity = REST_UTILITY.post("api/securities", security, SecurityDTO.class);
+		LOGGER.info("Security created: {}", returnedSecurity);
 		return returnedSecurity;
 	}
 
@@ -87,7 +87,7 @@ public class ApiFacade {
 	 * @return security
 	 */
 	public SecurityDTO getSecurity(UUID uuid) {
-		SecurityDTO returnedSecurity = restUtility.get("api/securities/" + uuid.toString(), SecurityDTO.class);
+		SecurityDTO returnedSecurity = REST_UTILITY.get("api/securities/" + uuid.toString(), SecurityDTO.class);
 		return returnedSecurity;
 	}
 
@@ -97,7 +97,7 @@ public class ApiFacade {
 	 */
 	public List<OrderDTO> getAllOrders() {
 		ObjectMapper mapper = new ObjectMapper();
-		List<OrderDTO> ordersList = mapper.convertValue(restUtility.get("api/orders/", List.class),
+		List<OrderDTO> ordersList = mapper.convertValue(REST_UTILITY.get("api/orders/", List.class),
 				new TypeReference<List<OrderDTO>>() {
 				});
 		return ordersList;
@@ -109,8 +109,8 @@ public class ApiFacade {
 	 * @return created order
 	 */
 	public OrderDTO createOrder(OrderDTO order) {
-		OrderDTO returnedOrder = restUtility.post("api/orders", order, OrderDTO.class);
-		logger.info("Order created: {}", returnedOrder);
+		OrderDTO returnedOrder = REST_UTILITY.post("api/orders", order, OrderDTO.class);
+		LOGGER.info("Order created: {}", returnedOrder);
 		return returnedOrder;
 	}
 
@@ -120,7 +120,7 @@ public class ApiFacade {
 	 * @return order
 	 */
 	public OrderDTO getOrder(UUID uuid) {
-		OrderDTO returnedOrder = restUtility.get("api/orders/" + uuid.toString(), OrderDTO.class);
+		OrderDTO returnedOrder = REST_UTILITY.get("api/orders/" + uuid.toString(), OrderDTO.class);
 		return returnedOrder;
 	}
 
@@ -130,7 +130,7 @@ public class ApiFacade {
 	 */
 	public List<TradeDTO> getAllTrades() {
 		ObjectMapper mapper = new ObjectMapper();
-		List<TradeDTO> tradesList = mapper.convertValue(restUtility.get("api/trades/", List.class),
+		List<TradeDTO> tradesList = mapper.convertValue(REST_UTILITY.get("api/trades/", List.class),
 				new TypeReference<List<TradeDTO>>() {
 				});
 		return tradesList;
@@ -142,7 +142,7 @@ public class ApiFacade {
 	 * @return trade
 	 */
 	public TradeDTO getTrade(UUID uuid) {
-		TradeDTO returnedTrade = restUtility.get("api/trades/" + uuid.toString(), TradeDTO.class);
+		TradeDTO returnedTrade = REST_UTILITY.get("api/trades/" + uuid.toString(), TradeDTO.class);
 		return returnedTrade;
 	}
 
@@ -153,7 +153,7 @@ public class ApiFacade {
 	 * @return trade
 	 */
 	public TradeDTO getTrade(UUID orderBuyId, UUID orderSellId) {
-		TradeDTO returnedTrade = restUtility.get(
+		TradeDTO returnedTrade = REST_UTILITY.get(
 				"api/trades/orderBuyId/" + orderBuyId.toString() + "/orderSellId/" + orderSellId.toString(),
 				TradeDTO.class);
 		return returnedTrade;

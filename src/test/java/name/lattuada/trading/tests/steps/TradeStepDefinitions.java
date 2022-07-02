@@ -25,25 +25,25 @@ public class TradeStepDefinitions implements IStepDefinitions {
 
 	@Then("a trade occurs with the price of {double} and quantity of {long}")
 	public void aTradeOccursWithThePriceOfAndQuantityOf(Double price, Long quantity) {
-		logger.trace("Got price = \"{}\"; quantity = \"{}\"", price, quantity);
-		TradeDTO trade = api.getTrade(context.buyOrder.getId(), context.sellOrder.getId());
+		LOGGER.trace("Got price = \"{}\"; quantity = \"{}\"", price, quantity);
+		TradeDTO trade = API.getTrade(CONTEXT.buyOrder.getId(), CONTEXT.sellOrder.getId());
 		assertEquals("Price not expected", trade.getPrice(), price);
 		assertEquals("Quantity not expected", trade.getQuantity(), quantity);
 	}
 
 	@Then("no trades occur")
 	public void noTradesOccur() {
-		assertThatThrownBy(() -> api.getTrade(context.buyOrder.getId(), context.sellOrder.getId()))
+		assertThatThrownBy(() -> API.getTrade(CONTEXT.buyOrder.getId(), CONTEXT.sellOrder.getId()))
 				.isInstanceOf(HttpClientErrorException.NotFound.class);
 	}
 
 	@Then("a trade occurs between {string} and {string}")
-	public void a_trade_occurs_between_and(String buyerName, String sellerName) {
+	public void verifyTradeExistsBetweenBuyerAndSeller(String buyerName, String sellerName) {
 		assertNotNull(getTradeBetweenTwoUsers(buyerName, sellerName));
 	}
 
 	@Then("a trade occurs between {string} and {string} with the price of {double} and quantity of {long}")
-	public void a_trade_occurs_between_and_with_the_price_of_and_quantity_of(String buyerName, String sellerName,
+	public void verifyTradeExistsBetweenBuyerAndSellerWithPriceAndQuantity(String buyerName, String sellerName,
 			Double price, Long quantity) {
 
 		TradeDTO actualTrade = getTradeBetweenTwoUsers(buyerName, sellerName);
@@ -53,12 +53,12 @@ public class TradeStepDefinitions implements IStepDefinitions {
 	}
 
 	private TradeDTO getTradeBetweenTwoUsers(String buyerName, String sellerName) {
-		UUID expectedBuyerId = context.userMap.get(buyerName).getId();
-		UUID expectedSellerId = context.userMap.get(sellerName).getId();
+		UUID expectedBuyerId = CONTEXT.userMap.get(buyerName).getId();
+		UUID expectedSellerId = CONTEXT.userMap.get(sellerName).getId();
 		UUID expectedBuyOrderId = null;
 		UUID expectedSellOrderId = null;
 
-		List<OrderDTO> orderList = api.getAllOrders();
+		List<OrderDTO> orderList = API.getAllOrders();
 		for (OrderDTO orderDTO : orderList) {
 			if (orderDTO.getUserId().equals(expectedBuyerId)) {
 				expectedBuyOrderId = orderDTO.getId();
@@ -66,6 +66,6 @@ public class TradeStepDefinitions implements IStepDefinitions {
 				expectedSellOrderId = orderDTO.getId();
 			}
 		}
-		return api.getTrade(expectedBuyOrderId, expectedSellOrderId);
+		return API.getTrade(expectedBuyOrderId, expectedSellOrderId);
 	}
 }

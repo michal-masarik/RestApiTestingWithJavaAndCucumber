@@ -41,26 +41,26 @@ public class OrderStepDefinitions implements IStepDefinitions {
 
 	@When("user {string} puts a {string} order for security {string} with a price of {double} and quantity of {long}")
 	@And("user {string} puts a {string} order for security {string} with a price of {double} and a quantity of {long}")
-	public void userPutAnOrder(String userName, String orderType, String securityName, Double price, Long quantity) {
-		logger.trace(
+	public void createNewOrder(String userName, String orderType, String securityName, Double price, Long quantity) {
+		LOGGER.trace(
 				"Got username = \"{}\"; orderType = \"{}\"; securityName = \"{}\"; price = \"{}\"; quantity = \"{}\"",
 				userName, EOrderType.valueOf(orderType.toUpperCase(Locale.ROOT)), securityName, price, quantity);
-		assertTrue(String.format("Unknown user \"%s\"", userName), context.userMap.containsKey(userName));
+		assertTrue(String.format("Unknown user \"%s\"", userName), CONTEXT.userMap.containsKey(userName));
 		assertTrue(String.format("Unknown security \"%s\"", securityName),
-				context.securityMap.containsKey(securityName));
+				CONTEXT.securityMap.containsKey(securityName));
 		createOrder(userName, EOrderType.valueOf(orderType.toUpperCase(Locale.ROOT)), securityName, price, quantity);
 	}
 
 	@Then("a {string} order from user {string} for security {string} with a price of {double} and quantity of {long} exists")
-	public void order_from_user_for_security_with_a_price_of_and_quantity_of_exists(String orderType, String userName,
+	public void orderWithUserWithTypeWithSecurityWithPriceWithQuantityExists(String orderType, String userName,
 			String securityName, Double price, Long quantity) {
 		OrderDTO expectedOrder;
-		if (orderType == (EOrderType.BUY.toString())) {
-			expectedOrder = context.buyOrder;
+		if (orderType.equals(EOrderType.BUY.toString())) {
+			expectedOrder = CONTEXT.buyOrder;
 		} else {
-			expectedOrder = context.sellOrder;
+			expectedOrder = CONTEXT.sellOrder;
 		}
-		OrderDTO actualOrder = api.getOrder(expectedOrder.getId());
+		OrderDTO actualOrder = API.getOrder(expectedOrder.getId());
 		assertEquals("Unexpected order type.", expectedOrder.getType(), actualOrder.getType());
 		assertEquals("Unexpected order price.", expectedOrder.getPrice(), actualOrder.getPrice());
 		assertEquals("Unexpected order quantity.", expectedOrder.getQuantity(), actualOrder.getQuantity());
@@ -69,56 +69,56 @@ public class OrderStepDefinitions implements IStepDefinitions {
 	}
 
 	@Given("known number of orders")
-	public void known_number_of_orders() {
+	public void getCurrentNumberOfOrders() {
 		numberOfOrders = getNumberOfOrders();
 	}
 
 	@Then("only {int} order was added")
-	public void only_order_was_added(Integer numberOfAddedOrders) {
+	public void verifyNumberNewOrdersAdded(Integer numberOfAddedOrders) {
 		int updatedNumberOfOrders = getNumberOfOrders();
 		assertEquals("Unexpected number of Orders", numberOfOrders + numberOfAddedOrders, updatedNumberOfOrders);
 	}
 
 	@Given("a random non-existing order")
-	public void a_random_non_existing_order() {
+	public void createNotExistingOrderId() {
 		nonExistingOrderId = UUID.randomUUID();
 	}
 
 	@When("we ask for the random order via the {string}")
-	public void we_ask_for_the_random_order_via_the(String location) {
-		context.response = RestAssured.get(location + "/" + nonExistingOrderId);
+	public void getNotExistingOrder(String location) {
+		CONTEXT.response = RestAssured.get(location + "/" + nonExistingOrderId);
 	}
 
 	@Given("random user and a random security")
-	public void random_user_and_a_random_security() {
+	public void createRandomOrderAndRandomSecurity() {
 		randomSecurity = SecurityStepDefinitions.createRandomSecurity();
 		randomUser = UserStepDefinitions.createUserEntity();
 	}
 
 	@When("we create new order via the {string}")
 	@When("we create new order via the {string} succesfully")
-	public void we_create_new_order_via_the_succesfully(String location) {
+	public void createOrder(String location) {
 		OrderDTO order = new OrderDTO();
 		order.setUserId(randomUser.getId());
 		order.setSecurityId(randomSecurity.getId());
 		order.setType(EOrderType.BUY);
 		order.setPrice(Double.valueOf(RandomStringUtils.randomNumeric(3)));
 		order.setQuantity(Long.valueOf(RandomStringUtils.randomNumeric(3)));
-		context.response = given().contentType(ContentType.JSON).body(order).post(location);
+		CONTEXT.response = given().contentType(ContentType.JSON).body(order).post(location);
 	}
 
 	@When("we create invalid order via the {string} without quantity and price")
-	public void we_create_invalid_order_via_the_without_quantity_and_price(String location) {
+	public void createInvalidOrder(String location) {
 		OrderDTO order = new OrderDTO();
 		order.setUserId(randomUser.getId());
 		order.setSecurityId(randomSecurity.getId());
 		order.setType(EOrderType.BUY);
-		context.response = given().contentType(ContentType.JSON).body(order).post(location);
+		CONTEXT.response = given().contentType(ContentType.JSON).body(order).post(location);
 	}
 
 	@Then("order is returned in body of response")
-	public void order_is_returned_in_body_of_response() {
-		Response response = context.response;
+	public void verifyOrderIsReturnedInResponse() {
+		Response response = CONTEXT.response;
 		response.then().body("userId", equalTo(randomUser.getId().toString()));
 		response.then().body("securityId", equalTo(randomSecurity.getId().toString()));
 	}
@@ -126,8 +126,8 @@ public class OrderStepDefinitions implements IStepDefinitions {
 	public static OrderDTO createOrderEntity(String userName, EOrderType orderType, String securityName, Double price,
 			Long quantity) {
 		OrderDTO orderDTO = new OrderDTO();
-		orderDTO.setUserId(context.userMap.get(userName).getId());
-		orderDTO.setSecurityId(context.securityMap.get(securityName).getId());
+		orderDTO.setUserId(CONTEXT.userMap.get(userName).getId());
+		orderDTO.setSecurityId(CONTEXT.securityMap.get(securityName).getId());
 		orderDTO.setType(orderType);
 		orderDTO.setPrice(price);
 		orderDTO.setQuantity(quantity);
@@ -135,17 +135,17 @@ public class OrderStepDefinitions implements IStepDefinitions {
 	}
 
 	private int getNumberOfOrders() {
-		List<OrderDTO> ordersList = api.getAllOrders();
+		List<OrderDTO> ordersList = API.getAllOrders();
 		return ordersList.size();
 	}
 
 	private void createOrder(String userName, EOrderType orderType, String securityName, Double price, Long quantity) {
 		OrderDTO orderDTO = createOrderEntity(userName, orderType, securityName, price, quantity);
-		OrderDTO orderReturned = api.createOrder(orderDTO);
+		OrderDTO orderReturned = API.createOrder(orderDTO);
 		if (EOrderType.BUY == (orderType)) {
-			context.buyOrder = orderReturned;
+			CONTEXT.buyOrder = orderReturned;
 		} else {
-			context.sellOrder = orderReturned;
+			CONTEXT.sellOrder = orderReturned;
 		}
 	}
 }

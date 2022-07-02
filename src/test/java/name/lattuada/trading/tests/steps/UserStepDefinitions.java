@@ -33,66 +33,66 @@ public class UserStepDefinitions implements IStepDefinitions {
 	private static String username;
 
 	@When("user {string} is created")
-	public void user_is_created(String username) {
-		logger.trace("username = \"{}\"", username);
+	public void createNewUser(String username) {
+		LOGGER.trace("username = \"{}\"", username);
 		UserDTO createdUser = createUser(username);
 		assertNotNull(createdUser);
 	}
 
 	@Then("user {string} exists")
-	public void user_exists(String username) {
-		logger.trace("username = \"{}\"", username);
+	public void verifyThatUserExists(String username) {
+		LOGGER.trace("username = \"{}\"", username);
 		UserDTO user = getUser(username);
 		assertEquals(username, user.getUsername());
 	}
 
 	@Then("both users {string} and {string} exist")
-	public void both_users_and_exist(String firstUsername, String secondUsername) {
-		logger.trace("firstUsername = \"{}\"; secondUsername = \"{}\"", firstUsername, secondUsername);
-		List<UserDTO> userList = api.getAllUsers();
-		assertUserNotInList(firstUsername, userList);
-		assertUserNotInList(secondUsername, userList);
+	public void verifyThatBothUsersExist(String firstUsername, String secondUsername) {
+		LOGGER.trace("firstUsername = \"{}\"; secondUsername = \"{}\"", firstUsername, secondUsername);
+		List<UserDTO> userList = API.getAllUsers();
+		assertUserIsInList(firstUsername, userList);
+		assertUserIsInList(secondUsername, userList);
 	}
 
 	@Given("known number of users")
-	public void known_number_of_users() {
+	public void getCurrentNumberOfUsers() {
 		numberOfUsers = getNumberOfUsers();
 	}
 
 	@Then("only {int} user was added")
-	public void only_user_was_added(Integer numberOfAddedUsers) {
+	public void verifyNumberOfUsersAdded(Integer numberOfAddedUsers) {
 		int updatedNumberOfUsers = getNumberOfUsers();
 		assertEquals("Unexpected number of users", numberOfUsers + numberOfAddedUsers, updatedNumberOfUsers);
 	}
 
 	@Given("a random non-existing user")
-	public void a_random_non_existing_user() {
+	public void createRandomNonExistingUser() {
 		nonExistingUserId = UUID.randomUUID();
 	}
 
 	@When("we ask for the random user via the {string}")
-	public void we_ask_for_the_random_user_via_the(String location) {
-		context.response = RestAssured.get(location + "/" + nonExistingUserId);	
+	public void getRandomUser(String location) {
+		CONTEXT.response = RestAssured.get(location + "/" + nonExistingUserId);
 	}
 
 	@When("we create new user via the {string} succesfully")
-	public void we_create_new_user_via_the_succesfully(String location) {
+	public void createNewUserSuccesfully(String location) {
 		UserDTO user = createUserEntity();
-		context.response = given().contentType(ContentType.JSON).body(user).post(location);
+		CONTEXT.response = given().contentType(ContentType.JSON).body(user).post(location);
 	}
 
 	@When("we create new user via the {string} without password")
-	public void we_create_new_user_via_the_without_password(String location) {
+	public void createUserWithoutPassword(String location) {
 		UserDTO user = createUserEntity();
 		user.setPassword(null);
-		context.response = given().contentType(ContentType.JSON).body(user).post(location);
+		CONTEXT.response = given().contentType(ContentType.JSON).body(user).post(location);
 	}
 
 	@Then("user is returned in body of response")
-	public void user_is_returned_in_body_of_response() {
-		context.response.then().body("username", equalTo(username));
+	public void verifyThatUserIsReturnedInResponseBody() {
+		CONTEXT.response.then().body("username", equalTo(username));
 	}
-	
+
 	public static UserDTO createUserEntity() {
 		UserDTO user = new UserDTO();
 		user.setId(UUID.randomUUID());
@@ -106,25 +106,24 @@ public class UserStepDefinitions implements IStepDefinitions {
 		UserDTO userDTO = new UserDTO();
 		userDTO.setUsername(username);
 		userDTO.setPassword(RandomStringUtils.randomAlphanumeric(64));
-		UserDTO returnedUser = api.createUser(userDTO);
-		context.userMap.put(username, returnedUser);
+		UserDTO returnedUser = API.createUser(userDTO);
+		CONTEXT.userMap.put(username, returnedUser);
 		return returnedUser;
 	}
 
 	private int getNumberOfUsers() {
-		List<UserDTO> userList = api.getAllUsers();
+		List<UserDTO> userList = API.getAllUsers();
 		return userList.size();
 	}
 
-	private void assertUserNotInList(String firstUsername, List<UserDTO> userList) {
-		UUID firstUserExpectedId = context.userMap.get(firstUsername).getId();
-		UserDTO firstUser = userList.stream().filter(user -> firstUserExpectedId.equals(user.getId())).findAny()
-				.orElse(null);
-		assertNotNull("User " + firstUsername + " doesn't exist", firstUser);
+	private void assertUserIsInList(String username, List<UserDTO> userList) {
+		UUID userExpectedId = CONTEXT.userMap.get(username).getId();
+		UserDTO user = userList.stream().filter(u -> userExpectedId.equals(u.getId())).findAny().orElse(null);
+		assertNotNull("User " + username + " doesn't exist", user);
 	}
 
 	private UserDTO getUser(String username) {
-		UUID userId = context.userMap.get(username).getId();
-		return api.getUser(userId);
+		UUID userId = CONTEXT.userMap.get(username).getId();
+		return API.getUser(userId);
 	}
 }
